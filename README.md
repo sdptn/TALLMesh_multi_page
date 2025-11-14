@@ -172,7 +172,7 @@ THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR I
 ## Acknowledgements
 
 - [Prof. Stefano De Paoli](https://www.linkedin.com/in/stefanodepaoli/) and [Alex Fawzi](https://www.linkedin.com/in/alex-fawzi-94710199/) for their research and development of this tool
-- [Ari Thomson] (https://www.linkedin.com/in/ari-alexander-tannahill-thomson/) for writing the code supporting the use of models on [BlaBla Door](https://helmholtz.cloud/services/?serviceID=d7d5c597-a2f6-4bd1-b71e-4d6499d98570)
+- [Ari Thomson](https://www.linkedin.com/in/ari-alexander-tannahill-thomson/) for writing the code supporting the use of models on [BlaBla Door](https://helmholtz.cloud/services/?serviceID=d7d5c597-a2f6-4bd1-b71e-4d6499d98570)
 - The British Academy for their support with funding for developing the GUI
 -  for significant improvements to the first version of the software 
 - Virginia Braun and Victoria Clarke for their seminal work on Thematic Analysis
