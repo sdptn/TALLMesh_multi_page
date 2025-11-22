@@ -174,7 +174,6 @@ Ensure that the codes cover a wide range of themes and ideas present in the text
 Important! Your response should be a JSON-like object with no additional text before or after. Failure to adhere to this instruction will invalidate your response, making it worthless.
 """, "temperature":0.00, "top_p":0.1}
 }
-
 reduce_duplicate_codes_prompts = {
     "Preset 1 - Reduce Duplicates": {"prompt":"""Analyze the following list of codes and their descriptions. Identify and merge any duplicate codes within this chunk. For each set of merged codes, provide:
 

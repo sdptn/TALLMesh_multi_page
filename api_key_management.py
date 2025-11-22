@@ -8,6 +8,9 @@ API_KEYS_FILE = 'api_keys.json'
 # File to store Azure credentials
 AZURE_SETTINGS_FILE = 'azure_settings.json'
 
+# Ari Thomson added - file for blablador keys and endpoint
+BLABLADOR_SETTINGS_FILE = 'blablador_settings.json'
+
 def load_azure_settings():
     if os.path.exists(AZURE_SETTINGS_FILE):
         with open(AZURE_SETTINGS_FILE, 'r') as f:
@@ -26,8 +29,10 @@ def get_azure_models():
     deployments = azure_settings.get('deployments', [])
     return [f"azure_{deployment}" for deployment in deployments] if deployments else []
 
+
 # List of LLM providers
-providers = ['OpenAI']#, 'Anthropic']
+# Ari added blablador as a provider
+providers = ['OpenAI', 'Blablador']#, 'Anthropic'] 
 
 def load_api_keys():
     if os.path.exists(API_KEYS_FILE):

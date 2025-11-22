@@ -129,3 +129,6 @@ top10/
 api_keys.json 
 azure_settings.json
 custom_prompts.json
+
+# adding to ignore list - Ari Thomson
+blablador_setting.json
