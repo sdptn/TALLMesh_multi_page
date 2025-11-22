@@ -15,8 +15,6 @@ logger = logging.getLogger(__name__)
 
 default_models = ["gpt-4o-mini", "gpt-4o", "gpt-4.1", "gpt-4.1-2025-04-14", "gpt-4.1-mini", "gpt-4.1-nano"] #, "claude-sonnet-3.5"] # Anthropic model removed, dependency issue with anthropic package
 
-
-#Add a way of checking what blablador models are currently up!
 blablador_models = ["Blablador - Qwen3-VL-32B-Instruct-FP8 (Large Model as of Novemeber 2025)"]#, "Blablador - Llama3.1 405b (Currently Testing)"] # Ari Thomson added blablador models, thought it best to keep them seperate from the GPT ones
 
 def exponential_backoff(attempt, max_attempts=5, base_delay=5, max_delay=120):
@@ -116,10 +114,6 @@ def llm_call(model, full_prompt, model_temperature, model_top_p):
 
                 alias = "alias-large"
 
-                if(model.startswith("Blablador - Llama")):
-                       alias = "alias-llama3-huge"
-
-
                 settings = {
                 "model": alias,
                 "messages":  [
@@ -139,15 +133,10 @@ def llm_call(model, full_prompt, model_temperature, model_top_p):
                     'Connection': 'close' 
                 }
 
-                response = requests.post(url="https://api.helmholtz-blablador.fz-juelich.de/v1/chat/completions", headers=headers, data=settings)  
+                response = requests.post(url="https://api.helmholtz-blablador.fz-juelich.de/v1/chat/completions", headers=headers, data=settings)  # make the api call
+                response_data = response.json() # parse the api call
 
-                print("Getting Response")
-                print(response)
-                print(response.text)
-                print("----------------")
-                response_data = response.json()
-
-                return response_data['choices'][0]['message']['content']
+                return response_data['choices'][0]['message']['content'] # return the content from the api call, we don't care about the other information
 
             
             else:

@@ -172,26 +172,7 @@ Important! Format the response as a JSON file with the following structure:
 Ensure that the codes cover a wide range of themes and ideas present in the text, including both obvious and subtle concepts. The goal is to provide a comprehensive starting point for further thematic analysis.
 
 Important! Your response should be a JSON-like object with no additional text before or after. Failure to adhere to this instruction will invalidate your response, making it worthless.
-""", "temperature":0.00, "top_p":0.1}, 
-
-"Preset 8: Blablador prompt, Ari Thomson" : {"prompt": """Using the interview section, create a comprehensive list of initial codes with the following strcuture,        
-
-{
-  "final_codes": [
-           {
-            "code_name": "Example Code Name",
-            "description": "description here",
-            "quote": "relevant quote here"
-            },
-      // additional codes follow the same structure
-]
-}
-The three headings, code_name, description, and quote, must be exactly present for each code 
-
-Ensure that the codes cover a wide range of themes and ideas present in the text, including both obvious and subtle concepts. The goal is to provide a comprehensive starting point for further thematic analysis.
-
-EXTREMLEY IMPORTANT! Do not include ANY text before or after the codes, failing to do this will result in your response being worthless
-""",  "temperature":0.00, "top_p":0.1}
+""", "temperature":0.00, "top_p":0.1}
 }
 reduce_duplicate_codes_prompts = {
     "Preset 1 - Reduce Duplicates": {"prompt":"""Analyze the following list of codes and their descriptions. Identify and merge any duplicate codes within this chunk. For each set of merged codes, provide:
