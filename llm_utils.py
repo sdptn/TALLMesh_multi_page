@@ -17,6 +17,8 @@ default_models = ["gpt-4o-mini", "gpt-4o", "gpt-4.1", "gpt-4.1-2025-04-14", "gpt
 
 blablador_models = ["Blablador - Qwen3-VL-32B-Instruct-FP8 (Large Model as of Novemeber 2025)"]#, "Blablador - Llama3.1 405b (Currently Testing)"] # Ari Thomson added blablador models, thought it best to keep them seperate from the GPT ones
 
+graphia_llm_models = ["DeepSeek-V3.1-vLLM", "DeepSeek-V3.1", "Qwen3-Coder-30B-A3B-Instruct-Q8_0"] #Add more as needed
+
 def exponential_backoff(attempt, max_attempts=5, base_delay=5, max_delay=120):
     if attempt >= max_attempts:
         raise Exception("Max retry attempts reached")
@@ -108,6 +110,34 @@ def llm_call(model, full_prompt, model_temperature, model_top_p):
                     logger.warning(f"Failed to extract valid JSON from Azure's response. Raw content: {content}")
                     raise ValueError("Failed to extract valid JSON from Azure's response")
                 return json.dumps(json_content)
+            
+            elif model.startswith("graphia-llm:"):
+                actual_model = model.split("graphia-llm:", 1)[1]
+
+                keys = load_api_keys()
+                proxy_key = keys.get('GRAPHIA_LLM')
+                if not proxy_key:
+                    st.error("GRAPHIA_LLM Proxy settings are not configured. Please set them up in the API Key Management page.")
+                    return None
+                
+                client = OpenAI(api_key=proxy_key, base_url="https://llm.graphia-ssh.eu")
+                response = client.chat.completions.create(
+                    model=actual_model,
+                    messages=[{"role": "user", "content": full_prompt}],
+                    response_format={"type": "json_object"},
+                    temperature=model_temperature,
+                    top_p=model_top_p
+                )
+                content = response.choices[0].message.content 
+                
+                if content and "<!DOCTYPE html>" in content:
+                    raise RuntimeError("GRAPHIA LLM returned HTML (likely 503 maintenance page).")
+                
+                json_content = extract_json(content)
+                if json_content is None:
+                    logger.warning(f"Failed to extract valid JSON from GRAPHIA_LLM response. Raw content: {content[:300]}")
+                    raise ValueError("Failed to extract valid JSON from GRAPHIA_LLM response")
+                return json.dumps(json_content) 
 
             #testing having the call outside the loop, even if i think it wont change anything 
             elif model.startswith("Blablador"):
@@ -128,7 +158,7 @@ def llm_call(model, full_prompt, model_temperature, model_top_p):
 
                 headers = {
                     'accept': 'application/json', 
-                    'Authorization': f'Bearer {load_api_keys().get('Blablador')}', 
+                    'Authorization': f"Bearer {load_api_keys().get('Blablador')}", 
                     'Content-Type': 'application/json',
                     'Connection': 'close' 
                 }
@@ -155,6 +185,10 @@ def llm_call(model, full_prompt, model_temperature, model_top_p):
                 else:
                     logger.error("Max attempts reached for JSON extraction")
                     return None
+                
+            elif "503" in str(e) or "maintenance" in str(e).lower() or "returned HTML" in str(e):
+                logger.info(f"Received 503 or maintenance response from GRAPHIA LLM (attempt {attempt + 1}/{max_attempts}). Backing off and retrying...")
+                exponential_backoff(attempt, base_delay=2, max_delay=30) 
             else:
                 logger.error(f"Unexpected error occurred: {str(e)}")
                 st.error(f"An unexpected error occurred: {str(e)}")

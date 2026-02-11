@@ -17,7 +17,7 @@ import re
 from api_key_management import manage_api_keys, load_api_keys, load_azure_settings, get_azure_models, AZURE_SETTINGS_FILE
 from project_utils import get_projects, get_project_files, get_processed_files, PROJECTS_DIR
 from prompts import reduce_duplicate_codes_1_v_all
-from llm_utils import llm_call, process_chunks, default_models
+from llm_utils import llm_call, process_chunks, default_models, graphia_llm_models
 import logging
 import tooltips
 import time
@@ -1048,7 +1048,7 @@ def main():
 
         # Model selection
         azure_models = get_azure_models()
-        model_options = default_models + azure_models
+        model_options = default_models + azure_models + graphia_llm_models
         selected_model = st.selectbox("Select Model", model_options, help=tooltips.model_tooltip)
 
         max_temperature_value = 2.0 if selected_model.startswith('gpt') else 1.0

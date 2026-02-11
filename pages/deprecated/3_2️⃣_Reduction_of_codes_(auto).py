@@ -463,7 +463,8 @@ def main():
         # Model selection
         default_models = ["gpt-4o-mini", "gpt-4o", "gpt-4-turbo", "claude-sonnet-3.5"]
         azure_models = get_azure_models()
-        model_options = default_models + azure_models
+        graphia_llm_models = ["DeepSeek-V3.1", "DeepSeek-V3.1-Large", "Qwen3-Coder-30B-A3b-Instruct-Q8_0]"]
+        model_options = default_models + azure_models + [f"graphia-llm:{m}" for m in graphia_llm_models]
         selected_model = st.selectbox("Select Model", model_options, help = tooltips.model_tooltip)
 
         max_temperature_value = 2.0 if selected_model.startswith('gpt') else 1.0

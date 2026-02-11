@@ -11,6 +11,10 @@ AZURE_SETTINGS_FILE = 'azure_settings.json'
 # Ari Thomson added - file for blablador keys and endpoint
 BLABLADOR_SETTINGS_FILE = 'blablador_settings.json'
 
+#G Rubidge added - file for graphia litellm models
+GRAPHIA_SETTINGS_FILE = 'graphia_settings.json'
+
+
 def load_azure_settings():
     if os.path.exists(AZURE_SETTINGS_FILE):
         with open(AZURE_SETTINGS_FILE, 'r') as f:
@@ -32,7 +36,7 @@ def get_azure_models():
 
 # List of LLM providers
 # Ari added blablador as a provider
-providers = ['OpenAI', 'Blablador']#, 'Anthropic'] 
+providers = ['OpenAI', 'Blablador', 'GRAPHIA_LLM']#, 'Anthropic'] 
 
 def load_api_keys():
     if os.path.exists(API_KEYS_FILE):
