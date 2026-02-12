@@ -6,6 +6,8 @@ from api_key_management import manage_api_keys
 import shutil
 from project_utils import get_projects
 from instructions import project_setup_instructions
+import stat
+import time #added to hopefully fix project deletion error by allowing for read-only files to be deleted after a small delay
 
 # Set logo
 logo = "pages/static/tmeshlogo.png"
@@ -59,9 +61,10 @@ def handle_file_upload():
     - Saves valid files to the project's data folder
     - Updates session state with success/warning messages about the upload process
     """
-    if st.session_state.uploaded_files:
+    uploaded = st.session_state.get("uploaded_files")
+    if uploaded:
         project_name = st.session_state.selected_project
-        saved_files, invalid_files = save_uploaded_files(st.session_state.uploaded_files, project_name)
+        saved_files, invalid_files = save_uploaded_files(uploaded, project_name)
         if saved_files:
             st.session_state.message = f"Files uploaded successfully: {', '.join(saved_files)}"
             st.session_state.message_type = "success"
@@ -179,7 +182,16 @@ def remove_project(project_name):
     project_path = os.path.join(PROJECTS_DIR, project_name)
     if os.path.exists(project_path):
         try:
-            shutil.rmtree(project_path)
+            
+            # shutil.rmtree(project_path) #Error not allowing deletion of projects
+            
+            def remove_readonly(func, path, exc_info):
+                os.chmod(path, stat.S_IWRITE)
+                func(path)
+            time.sleep(0.5) # Small delay to ensure all files are deleted before proceeding
+            shutil.rmtree(project_path, onerror=remove_readonly)
+            
+            
             st.session_state.message = f"Project '{project_name}' has been successfully removed."
             st.session_state.message_type = "success"
             # Update the projects list in session state
@@ -228,8 +240,9 @@ if 'selected_project' not in st.session_state:
 if 'delete_project' not in st.session_state:
     st.session_state.delete_project = None
 
-if 'uploaded_files' not in st.session_state:
-    st.session_state.uploaded_files = None
+
+#if 'uploaded_files' not in st.session_state:
+#    st.session_state.uploaded_files = None #hopefully fixing Project Start widget error
 
 # ==============================================================================
 #                             MAIN STREAMLIT FUNCTION
