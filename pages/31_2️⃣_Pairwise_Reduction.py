@@ -18,7 +18,7 @@ import re
 from api_key_management import manage_api_keys, load_api_keys, load_azure_settings, get_azure_models, AZURE_SETTINGS_FILE
 from project_utils import get_projects, get_project_files, get_processed_files, PROJECTS_DIR
 from prompts import reduce_duplicate_codes_pairwise
-from llm_utils import llm_call, default_models, blablador_models
+from llm_utils import llm_call, default_models, blablador_models, elm_models #Georgia added elm_models
 import logging
 import tooltips
 import time
@@ -333,6 +333,7 @@ def reduce_based_on_similarities(similarity_results, codes_by_file, model, model
             merge_prompt = generate_merge_prompt(group_codes, include_merge_explanation)
             try:
                 response = llm_call(model, merge_prompt, model_temperature, model_top_p)
+                response = re.sub(r"^```(?:json)?\s*|\s*```$", "", response.strip()) # Assist ELM fenced JSON
                 merged_details = json.loads(response)['merged_code']
                 time.sleep(1)
                 
@@ -574,7 +575,7 @@ def main():
         st.divider()
         st.subheader(":orange[LLM Settings]")
         azure_models = get_azure_models()
-        model_options = default_models + azure_models + blablador_models
+        model_options = default_models + azure_models + blablador_models + elm_models
         selected_model = st.selectbox("Select Model", model_options, help=tooltips.model_tooltip)
         max_temperature_value = 2.0 if selected_model.startswith('gpt') else 1.0
         

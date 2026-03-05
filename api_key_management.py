@@ -32,7 +32,8 @@ def get_azure_models():
 
 # List of LLM providers
 # Ari added blablador as a provider
-providers = ['OpenAI', 'Blablador']#, 'Anthropic'] 
+# Georgia added ELM as a provider
+providers = ['OpenAI', 'Blablador', 'ELM']#, 'Anthropic'] 
 
 def load_api_keys():
     if os.path.exists(API_KEYS_FILE):

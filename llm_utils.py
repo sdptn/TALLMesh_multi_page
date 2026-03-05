@@ -17,6 +17,10 @@ default_models = ["gpt-4o-mini", "gpt-4o", "gpt-4.1", "gpt-4.1-2025-04-14", "gpt
 
 blablador_models = ["Blablador - Qwen3-VL-32B-Instruct-FP8 (Large Model as of Novemeber 2025)"]#, "Blablador - Llama3.1 405b (Currently Testing)"] # Ari Thomson added blablador models, thought it best to keep them seperate from the GPT ones
 
+elm_models = [
+    "elm_meta-llama/Llama-3.3-70B-Instruct",]   #Georgia added ELM models, these are the ones we have access to via Edinburgh Uni for Summer modules
+
+
 def exponential_backoff(attempt, max_attempts=5, base_delay=5, max_delay=120):
     if attempt >= max_attempts:
         raise Exception("Max retry attempts reached")
@@ -109,6 +113,33 @@ def llm_call(model, full_prompt, model_temperature, model_top_p):
                     raise ValueError("Failed to extract valid JSON from Azure's response")
                 return json.dumps(json_content)
 
+            elif model.startswith("elm_"):
+                elm_key = load_api_keys().get('ELM')
+                if not elm_key:
+                    st.error("ELM API key is missing. Add it in the API Key Management sidebar.")
+                    return None
+                
+                client = OpenAI(
+                    base_url="https://elm.edina.ac.uk/api/v1",
+                    api_key=elm_key,
+                                    
+                )
+
+                elm_model_name = model.split("elm_", 1)[1]
+
+                response = client.chat.completions.create(
+                    model=elm_model_name,
+                    messages=[{"role": "user", "content": full_prompt}],
+                    temperature=model_temperature,
+                    top_p=model_top_p,
+                )
+
+                content = response.choices[0].message.content
+                json_content = extract_json(content)
+                if json_content is None:
+                    logger.warning(f"Failed to extract valid JSON from ELM's response. Raw content: {content}")
+                    raise ValueError("Failed to extract valid JSON from ELM's response")
+                return json.dumps(json_content)
             #testing having the call outside the loop, even if i think it wont change anything 
             elif model.startswith("Blablador"):
 
@@ -128,7 +159,7 @@ def llm_call(model, full_prompt, model_temperature, model_top_p):
 
                 headers = {
                     'accept': 'application/json', 
-                    'Authorization': f'Bearer {load_api_keys().get('Blablador')}', 
+                    'Authorization': f"Bearer {load_api_keys().get('Blablador')}", #Georgia changed single quotations to double for bug fixing
                     'Content-Type': 'application/json',
                     'Connection': 'close' 
                 }

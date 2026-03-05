@@ -12,7 +12,7 @@ import re
 from api_key_management import manage_api_keys, load_api_keys, load_azure_settings, get_azure_models, AZURE_SETTINGS_FILE
 from prompts import initial_coding_prompts
 from project_utils import get_projects, get_project_files, get_processed_files, PROJECTS_DIR
-from llm_utils import llm_call, default_models, blablador_models # Ari Thomson added blablador models
+from llm_utils import llm_call, default_models, blablador_models, elm_models, extract_json  # Ari Thomson added blablador models # Georgia added ELM models
 import logging
 import tooltips
 import time
@@ -122,6 +122,7 @@ def process_file(file_path, model, prompt, model_temperature, model_top_p, statu
             continue
 
         try:
+            chunk_response = re.sub(r"^```(?:json)?\s*|\s*```$", "", chunk_response.strip())  #Georgia - trying to fix ELM no codes
             json_output = json.loads(chunk_response)
             if isinstance(json_output, dict) and 'final_codes' in json_output:
                 chunk_codes = json_output['final_codes']
@@ -221,7 +222,7 @@ def main():
         
         # Model selection
         azure_models = get_azure_models()
-        model_options = default_models + azure_models + blablador_models # default models imported from llm_utils # Ari Thomson added, blablador models is also imported from llm_utils
+        model_options = default_models + azure_models + blablador_models + elm_models # default models imported from llm_utils # Ari Thomson added, blablador models is also imported from llm_utils # Georgia added ELM models, also imported from llm_utils
         selected_model = st.selectbox("Select Model", model_options, help = tooltips.model_tooltip)
         
         # OpenAI & Anthropic Models have different max temperature settings (2 & 1, respectively)
