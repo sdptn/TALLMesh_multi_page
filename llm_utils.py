@@ -1,21 +1,16 @@
-from openai import OpenAI, AzureOpenAI
-#import anthropic
+from openai import OpenAI
 import streamlit as st
-from api_key_management import load_api_keys, load_azure_settings
 import time
 import random
 import logging
 import json
 import re
-
-import requests # Ari Thomson added - need this for making api requests to Blablador as there is no wrapper, already in the requirements file, super handy
+from api_key_management import load_api_keys
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-default_models = ["gpt-4o-mini", "gpt-4o", "gpt-4.1", "gpt-4.1-2025-04-14", "gpt-4.1-mini", "gpt-4.1-nano"] #, "claude-sonnet-3.5"] # Anthropic model removed, dependency issue with anthropic package
-
-blablador_models = ["Blablador - Qwen3-VL-32B-Instruct-FP8 (Large Model as of Novemeber 2025)"]#, "Blablador - Llama3.1 405b (Currently Testing)"] # Ari Thomson added blablador models, thought it best to keep them seperate from the GPT ones
+graphia_llm_models = ["DeepSeek-V3.1-vLLM", "Qwen3-Coder-30B-A3B-Instruct-Q8_0"] #Add more as needed
 
 def exponential_backoff(attempt, max_attempts=5, base_delay=5, max_delay=120):
     if attempt >= max_attempts:
@@ -41,103 +36,35 @@ def extract_json(text):
 def llm_call(model, full_prompt, model_temperature, model_top_p):
     max_attempts = 5
     for attempt in range(max_attempts):
-        try:
-            if model.startswith("gpt"):
-                client = OpenAI(api_key=load_api_keys().get('OpenAI'))
+        try:    
+            if model.startswith("graphia-llm:"):
+                actual_model = model.split("graphia-llm:", 1)[1]
+
+                keys = load_api_keys()
+                proxy_key = keys.get('GRAPHIA_LLM')
+                if not proxy_key:
+                    st.error("GRAPHIA_LLM Proxy settings are not configured. Please set them up in the API Key Management page.")
+                    return None
+
+                client = OpenAI(api_key=proxy_key, base_url="https://llm.graphia-ssh.eu")
                 response = client.chat.completions.create(
-                    model=model,
+                    model=actual_model,
                     messages=[{"role": "user", "content": full_prompt}],
-                    response_format={ "type": "json_object" },
+                    response_format={"type": "json_object"},
                     temperature=model_temperature,
                     top_p=model_top_p
                 )
-                return response.choices[0].message.content
+                content = response.choices[0].message.content 
+
+                if content and "<!DOCTYPE html>" in content:
+                    raise RuntimeError("GRAPHIA LLM returned HTML (likely 503 maintenance page).")
+
+                json_content = extract_json(content)
+                if json_content is None:
+                    logger.warning(f"Failed to extract valid JSON from GRAPHIA_LLM response. Raw content: {content[:300]}")
+                    raise ValueError("Failed to extract valid JSON from GRAPHIA_LLM response")
+                return json.dumps(json_content) 
             
-            elif model.startswith("claude"):
-                client = anthropic.Anthropic(api_key=load_api_keys().get('Anthropic'))
-                response = client.messages.create(
-                    model="claude-3-5-sonnet-20240620",
-                    max_tokens=8192,
-                    temperature=model_temperature,
-                    top_p=model_top_p,
-                    messages=[{"role": "user", "content": full_prompt}]
-                )
-                content = response.content[0].text
-                json_content = extract_json(content)
-                if json_content is None:
-                    logger.warning(f"Failed to extract valid JSON from Claude's response. Raw content: {content}")
-                    raise ValueError("Failed to extract valid JSON from Claude's response")
-                return json.dumps(json_content)
-
-            elif model.startswith("azure_"):
-                azure_settings = load_azure_settings()
-                if not azure_settings:
-                    st.error("Azure settings are not configured. Please set them up in the Azure Settings page.")
-                    return None
-
-                print(f"Azure settings: {azure_settings}")
-                print(f"Azure settings type: {type(azure_settings)}")
-
-                deployment_name = model.split("azure_")[1]
-                
-                if 'deployments' not in azure_settings or not isinstance(azure_settings['deployments'], list):
-                    st.error("Invalid Azure settings format. 'deployments' should be a list.")
-                    return None
-
-                deployment = next((d for d in azure_settings['deployments'] if d == deployment_name), None)
-                
-                if not deployment:
-                    st.error(f"Selected Azure deployment '{deployment_name}' not found in settings.")
-                    return None
-
-                client = AzureOpenAI(
-                    api_key=azure_settings['api_key'],
-                    api_version="2024-10-21",
-                    azure_endpoint=azure_settings['endpoint']
-                )
-                response = client.chat.completions.create(
-                    model=deployment,
-                    messages=[{"role": "user", "content": full_prompt}],
-                    temperature=model_temperature,
-                    top_p=model_top_p
-                )
-                content = response.choices[0].message.content
-
-                json_content = extract_json(content)
-                if json_content is None:
-                    logger.warning(f"Failed to extract valid JSON from Azure's response. Raw content: {content}")
-                    raise ValueError("Failed to extract valid JSON from Azure's response")
-                return json.dumps(json_content)
-
-            #testing having the call outside the loop, even if i think it wont change anything 
-            elif model.startswith("Blablador"):
-
-                alias = "alias-large"
-
-                settings = {
-                "model": alias,
-                "messages":  [
-                                {"role": "system", "content": "You are a helpful assistant."},
-                                {"role": "user", "content": full_prompt}
-                ],
-                "temperature": model_temperature,
-                "top_p": model_top_p,
-                }
-
-                settings = json.dumps(settings)
-
-                headers = {
-                    'accept': 'application/json', 
-                    'Authorization': f'Bearer {load_api_keys().get('Blablador')}', 
-                    'Content-Type': 'application/json',
-                    'Connection': 'close' 
-                }
-
-                response = requests.post(url="https://api.helmholtz-blablador.fz-juelich.de/v1/chat/completions", headers=headers, data=settings)  # make the api call
-                response_data = response.json() # parse the api call
-
-                return response_data['choices'][0]['message']['content'] # return the content from the api call, we don't care about the other information
-
             
             else:
                 st.error(f"Unsupported model type: {model}")
@@ -155,6 +82,10 @@ def llm_call(model, full_prompt, model_temperature, model_top_p):
                 else:
                     logger.error("Max attempts reached for JSON extraction")
                     return None
+
+            elif "503" in str(e) or "maintenance" in str(e).lower() or "returned HTML" in str(e):
+                logger.info(f"Received 503 or maintenance response from GRAPHIA LLM (attempt {attempt + 1}/{max_attempts}). Backing off and retrying...")
+                exponential_backoff(attempt, base_delay=2, max_delay=30) 
             else:
                 logger.error(f"Unexpected error occurred: {str(e)}")
                 st.error(f"An unexpected error occurred: {str(e)}")

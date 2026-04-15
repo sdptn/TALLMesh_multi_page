@@ -7,7 +7,7 @@ from api_key_management import manage_api_keys, load_api_keys
 
 # Constants
 THEME_BOOKS_FOLDER = 'theme_books'
-EXPANDED_REDUCED_CODES_FOLDER = 'expanded_reduced_codes'
+EXPANDED_REDUCED_CODES_FOLDER = 'expanded_pairwise_reduced_codes'
 
 # Set logo
 logo = "pages/static/tmeshlogo.png"

@@ -15,10 +15,10 @@ import streamlit as st
 import pandas as pd
 import json
 import re
-from api_key_management import manage_api_keys, load_api_keys, load_azure_settings, get_azure_models, AZURE_SETTINGS_FILE
+from api_key_management import manage_api_keys
 from project_utils import get_projects, get_project_files, get_processed_files, PROJECTS_DIR
 from prompts import reduce_duplicate_codes_pairwise
-from llm_utils import llm_call, default_models, blablador_models
+from llm_utils import llm_call, graphia_llm_models
 import logging
 import tooltips
 import time
@@ -573,9 +573,9 @@ def main():
 
         st.divider()
         st.subheader(":orange[LLM Settings]")
-        azure_models = get_azure_models()
-        model_options = default_models + azure_models + blablador_models
+        model_options = graphia_llm_models
         selected_model = st.selectbox("Select Model", model_options, help=tooltips.model_tooltip)
+        actual_model = f"graphia-llm:{selected_model}" if selected_model in graphia_llm_models else selected_model
         max_temperature_value = 2.0 if selected_model.startswith('gpt') else 1.0
         
         custom_prompts = load_custom_prompts().get('Pairwise Reduction', {})
@@ -636,7 +636,7 @@ def main():
             similarity_results = process_pairwise_comparisons(
                 codes_by_file=codes_by_file,
                 file_pairs=pairs,
-                model=selected_model,
+                model=actual_model,
                 prompt=prompt_input,
                 model_temperature=model_temperature,
                 model_top_p=model_top_p,
@@ -647,7 +647,7 @@ def main():
             reduced_df = reduce_based_on_similarities(
                 similarity_results=similarity_results,
                 codes_by_file=codes_by_file,
-                model=selected_model,
+                model=actual_model,
                 model_temperature=model_temperature,
                 model_top_p=model_top_p,
                 include_quotes=include_quotes,

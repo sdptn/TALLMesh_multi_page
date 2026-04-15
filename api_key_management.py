@@ -5,34 +5,8 @@ import os
 # File to store API keys
 API_KEYS_FILE = 'api_keys.json'
 
-# File to store Azure credentials
-AZURE_SETTINGS_FILE = 'azure_settings.json'
-
-# Ari Thomson added - file for blablador keys and endpoint
-BLABLADOR_SETTINGS_FILE = 'blablador_settings.json'
-
-def load_azure_settings():
-    if os.path.exists(AZURE_SETTINGS_FILE):
-        with open(AZURE_SETTINGS_FILE, 'r') as f:
-            content = f.read().strip()
-            if content:
-                try:
-                    return json.loads(content)
-                except json.JSONDecodeError:
-                    print("Warning: Azure settings file is corrupted. Returning empty settings.")
-            else:
-                print("Info: Azure settings file is empty.")
-    return {}
-
-def get_azure_models():
-    azure_settings = load_azure_settings()
-    deployments = azure_settings.get('deployments', [])
-    return [f"azure_{deployment}" for deployment in deployments] if deployments else []
-
-
 # List of LLM providers
-# Ari added blablador as a provider
-providers = ['OpenAI', 'Blablador']#, 'Anthropic'] 
+providers = ['GRAPHIA_LLM']
 
 def load_api_keys():
     if os.path.exists(API_KEYS_FILE):
@@ -75,7 +49,3 @@ def manage_api_keys():
             save_api_keys(st.session_state.api_keys)
             st.sidebar.success(f"API Key for {provider} deleted.")
             st.rerun()
-
-    # Add a link to the Azure settings page
-    #st.sidebar.markdown("---")
-    #st.sidebar.markdown("[Manage Azure Settings](12_⚙️_Azure_Settings)")

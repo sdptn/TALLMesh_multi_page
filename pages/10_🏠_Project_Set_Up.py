@@ -1,11 +1,12 @@
 # Import necessary libraries
 import os
 import streamlit as st
-import json
 from api_key_management import manage_api_keys
 import shutil
 from project_utils import get_projects
 from instructions import project_setup_instructions
+import stat
+import time #added to hopefully fix project deletion error by allowing for read-only files to be deleted after a small delay
 
 # Set logo
 logo = "pages/static/tmeshlogo.png"
@@ -13,11 +14,11 @@ st.logo(logo)
 
 # Define the directory where all projects will be stored
 PROJECTS_DIR = 'projects'
-FOLDER_ORDER = ['data', 'initial_codes', 'reduced_codes', 'expanded_reduced_codes', 'themes', 'theme_books']
+FOLDER_ORDER = ['data', 'initial_codes', 'pairwise_reduced_codes', 'expanded_pairwise_reduced_codes', 'themes', 'theme_books']
 
-def get_project_structure(project):
+def get_project_structure(project_name):
     structure = {folder: [] for folder in FOLDER_ORDER} # Initialize structure with empty lists for each folder
-    project_path = os.path.join(PROJECTS_DIR, project) # Construct the full path to the project folder    
+    project_path = os.path.join(PROJECTS_DIR, project_name) # Construct the full path to the project folder    
     for folder in FOLDER_ORDER:
         folder_path = os.path.join(project_path, folder)
         if os.path.exists(folder_path):
@@ -59,9 +60,10 @@ def handle_file_upload():
     - Saves valid files to the project's data folder
     - Updates session state with success/warning messages about the upload process
     """
-    if st.session_state.uploaded_files:
+    uploaded = st.session_state.get("uploaded_files")
+    if uploaded:
         project_name = st.session_state.selected_project
-        saved_files, invalid_files = save_uploaded_files(st.session_state.uploaded_files, project_name)
+        saved_files, invalid_files = save_uploaded_files(uploaded, project_name)
         if saved_files:
             st.session_state.message = f"Files uploaded successfully: {', '.join(saved_files)}"
             st.session_state.message_type = "success"
@@ -92,10 +94,8 @@ def create_project(project_name):
     project_path = os.path.join(PROJECTS_DIR, project_name)
     os.makedirs(project_path, exist_ok=True)
     
-    # Create subfolders for different stages of the analysis
-    subfolders = ['data', 'initial_codes', 'reduced_codes', 'expanded_reduced_codes', 'themes', 'theme_books']
-    for folder in subfolders:
-        os.makedirs(os.path.join(project_path, folder), exist_ok=True)
+    for folder in FOLDER_ORDER:
+        os.makedirs(os.path.join(project_path, folder), exist_ok=True) 
 
 # Function to save uploaded files
 def save_uploaded_files(uploaded_files, project_name):
@@ -178,8 +178,14 @@ def remove_project(project_name):
     """
     project_path = os.path.join(PROJECTS_DIR, project_name)
     if os.path.exists(project_path):
-        try:
-            shutil.rmtree(project_path)
+        try: 
+            # shutil.rmtree(project_path) #Error not allowing deletion of projects
+            def remove_readonly(func, path, exc_info):
+                os.chmod(path, stat.S_IWRITE)
+                func(path)
+            time.sleep(0.5) # Small delay to ensure all files are deleted before proceeding
+            shutil.rmtree(project_path, onerror=remove_readonly)
+
             st.session_state.message = f"Project '{project_name}' has been successfully removed."
             st.session_state.message_type = "success"
             # Update the projects list in session state
@@ -193,25 +199,6 @@ def remove_project(project_name):
         st.session_state.message = f"Project '{project_name}' does not exist."
         st.session_state.message_type = "warning"
 
-# New function to get contents of all subfolders in a project
-def get_project_structure(project_name):
-    """
-    Get the structure of a project, including all subfolders and their contents.
-
-    Args:
-    project_name (str): Name of the project
-
-    Returns:
-    dict: A dictionary representing the project structure
-    """
-    project_path = os.path.join(PROJECTS_DIR, project_name)
-    structure = {}
-    for root, dirs, files in os.walk(project_path):
-        folder = os.path.relpath(root, project_path)
-        if folder == '.':
-            continue
-        structure[folder] = files
-    return structure
 
 # Initialize session state variables
 # These variables persist across Streamlit reruns and store important application state
@@ -228,8 +215,8 @@ if 'selected_project' not in st.session_state:
 if 'delete_project' not in st.session_state:
     st.session_state.delete_project = None
 
-if 'uploaded_files' not in st.session_state:
-    st.session_state.uploaded_files = None
+#if 'uploaded_files' not in st.session_state:
+#   st.session_state.uploaded_files = None #hopefully f
 
 # ==============================================================================
 #                             MAIN STREAMLIT FUNCTION

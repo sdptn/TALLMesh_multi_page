@@ -44,7 +44,7 @@ def load_data(project_name):
     """
     # Define paths for themes and codes folders
     themes_folder = os.path.join(PROJECTS_DIR, project_name, 'theme_books')
-    codes_folder = os.path.join(PROJECTS_DIR, project_name, 'expanded_reduced_codes')
+    codes_folder = os.path.join(PROJECTS_DIR, project_name, 'expanded_pairwise_reduced_codes')
     
     # Get list of theme files and filter for 'expanded' themes
     themes_files = get_processed_files(project_name, 'theme_books')
@@ -57,7 +57,7 @@ def load_data(project_name):
     themes_df = pd.read_csv(os.path.join(themes_folder, latest_themes_file))
     
     # Get list of codes files
-    codes_files = get_processed_files(project_name, 'expanded_reduced_codes')
+    codes_files = get_processed_files(project_name, 'expanded_pairwise_reduced_codes')
     if not codes_files:
         return None, None
     

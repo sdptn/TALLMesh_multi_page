@@ -13,10 +13,10 @@ import streamlit as st
 import pandas as pd
 import json
 import os
-from api_key_management import manage_api_keys, load_api_keys, load_azure_settings, get_azure_models, AZURE_SETTINGS_FILE
+from api_key_management import manage_api_keys, load_api_keys
 from project_utils import get_projects, get_project_files, get_processed_files
 from prompts import finding_themes_prompts, json_template
-from llm_utils import llm_call, default_models, blablador_models
+from llm_utils import llm_call, graphia_llm_models
 import logging
 import tooltips
 import time
@@ -157,6 +157,11 @@ def process_codes(selected_files, model, prompt, model_temperature, model_top_p,
     logger.info("Calling AI model to process codes")
     processed_output = llm_call(model, full_prompt, model_temperature, model_top_p)
     
+    if not processed_output:
+        logger.error("No response returned from llm_call")
+        st.error("No response returned from the selected model.")
+        return None, preprocessed_df, None
+
     # Extract and parse the JSON response
     status_text.info("Parsing AI response...")
     progress_bar.progress(1.0)
@@ -378,7 +383,7 @@ def load_data(project_name):
     """
     # Define paths for themes and codes folders
     themes_folder = os.path.join(PROJECTS_DIR, project_name, 'themes')
-    codes_folder = os.path.join(PROJECTS_DIR, project_name, 'reduced_codes')
+    codes_folder = os.path.join(PROJECTS_DIR, project_name, 'pairwise_reduced_codes')
     
     # Get the most recent themes file
     themes_files = get_processed_files(project_name, 'themes')
@@ -388,7 +393,7 @@ def load_data(project_name):
     themes_df = pd.read_csv(os.path.join(themes_folder, latest_themes_file))
     
     # Get the most recent reduced codes file
-    codes_files = get_processed_files(project_name, 'reduced_codes')
+    codes_files = get_processed_files(project_name, 'pairwise_reduced_codes')
     if not codes_files:
         return None, None
     latest_codes_file = max(codes_files, key=lambda f: os.path.getmtime(os.path.join(codes_folder, f)))
@@ -473,7 +478,7 @@ def main():
 
     if selected_project != "Select a project...":
         # Get and display project files for selection
-        project_files = get_project_files(selected_project, 'reduced_codes')
+        project_files = get_project_files(selected_project, 'pairwise_reduced_codes')
         
         with st.expander("Select files to process", expanded=True):
             col1, col2 = st.columns([0.9, 0.2])
@@ -485,15 +490,16 @@ def main():
                 col1.write(file)
                 file_checkboxes[file] = col2.checkbox(".", key=f"checkbox_{file}", value=select_all, label_visibility="hidden")
 
-        selected_files = [os.path.join(PROJECTS_DIR, selected_project, 'reduced_codes', file) for file, checked in file_checkboxes.items() if checked]
+        selected_files = [os.path.join(PROJECTS_DIR, selected_project, 'pairwise_reduced_codes', file) for file, checked in file_checkboxes.items() if checked]
 
         st.divider()
         st.subheader(":orange[LLM Settings]")
 
         # Model selection
-        azure_models = get_azure_models()
-        model_options = default_models + azure_models + blablador_models
+        model_options = graphia_llm_models
         selected_model = st.selectbox("Select Model", model_options, help=tooltips.model_tooltip)
+
+        actual_model = f"graphia-llm:{selected_model}"
 
         max_temperature_value = 2.0 if selected_model.startswith('gpt') else 1.0
 
@@ -534,7 +540,7 @@ def main():
             with st.spinner("Finding themes... please wait..."):
                 # Process the selected files and display results
                 themes_output, processed_df, unassigned_codes = process_codes(
-                    selected_files, selected_model, prompt_input, 
+                    selected_files, actual_model, prompt_input, 
                     model_temperature, model_top_p, include_quotes, 
                     force_theme_assignment
                 )

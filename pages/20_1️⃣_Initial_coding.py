@@ -9,10 +9,10 @@ import os
 import pandas as pd
 import json
 import re
-from api_key_management import manage_api_keys, load_api_keys, load_azure_settings, get_azure_models, AZURE_SETTINGS_FILE
+from api_key_management import manage_api_keys
 from prompts import initial_coding_prompts
 from project_utils import get_projects, get_project_files, get_processed_files, PROJECTS_DIR
-from llm_utils import llm_call, default_models, blablador_models # Ari Thomson added blablador models
+from llm_utils import llm_call, graphia_llm_models 
 import logging
 import tooltips
 import time
@@ -83,15 +83,6 @@ def split_text(text, max_chunk_size=50000, overlap=1000):
     
     logger.info(f"Total number of chunks created: {len(chunks)}")
     return chunks
-
-def split_text_blablador(text):
-
-
-    #split the text based on the prompt that'll be used to stay below a speccifc tokenb count so that all propmpts are useable!
-
-
-    return split_text()
-
 
 def process_file(file_path, model, prompt, model_temperature, model_top_p, status_message):
     # Specify encoding to handle potential UnicodeDecodeError
@@ -220,12 +211,10 @@ def main():
         st.subheader(":orange[LLM Settings]")
         
         # Model selection
-        azure_models = get_azure_models()
-        model_options = default_models + azure_models + blablador_models # default models imported from llm_utils # Ari Thomson added, blablador models is also imported from llm_utils
+        model_options = graphia_llm_models
         selected_model = st.selectbox("Select Model", model_options, help = tooltips.model_tooltip)
-        
-        # OpenAI & Anthropic Models have different max temperature settings (2 & 1, respectively)
-        max_temperature_value = 2.0 if selected_model.startswith('gpt') else 1.0
+        actual_model = f"graphia-llm:{selected_model}"
+        max_temperature_value = 1.0
         
         # Load custom prompts
         custom_prompts = load_custom_prompts().get('Initial Coding', {})
@@ -261,7 +250,7 @@ def main():
                     file_path = os.path.join(PROJECTS_DIR, selected_project, 'data', file)
                     try:
                         status_message.info(f"Processing file {i+1}/{len(selected_files)}: {file}")
-                        processed_output = process_file(file_path, selected_model, prompt_input, model_temperature, model_top_p, status_message)
+                        processed_output = process_file(file_path, actual_model, prompt_input, model_temperature, model_top_p, status_message)
                         json_output = json.loads(processed_output)
                         df = pd.json_normalize(json_output['final_codes'])
                         df.columns = ['code', 'description', 'quote']
