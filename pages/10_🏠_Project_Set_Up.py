@@ -330,30 +330,7 @@ def main():
             
             st.warning(f"Are you sure you want to delete the project '{st.session_state.selected_project}'? This action cannot be undone.")
 
-        # Display existing files with checkboxes
-        try:
-            existing_files = get_project_files(st.session_state.selected_project)
-        except:
-            existing_files = []
-
-        files_to_delete = []
-        
-
-        if existing_files:
-            #st.write("Select files to delete:") # commented out as there's now a dedicated file management section at bottom of page
-            # List files with checkboxes
-            #for file in existing_files:
-            #    if st.checkbox(file, key=f"checkbox_{file}"):
-            #        files_to_delete.append(file)
-            
-            # Show delete button, disabled if no files are selected
-            #if st.button("Delete Selected", disabled=len(files_to_delete) == 0):
-            #    remove_files(st.session_state.selected_project, files_to_delete)
-            #    st.success(f"Deleted {len(files_to_delete)} file(s)")
-            #    st.rerun()
-            pass
-        else:
-            st.write("No files in this project yet. Upload files below to get started")
+        st.write("Upload files below to get started or manage files in the section below")
         
         # File upload UI
         st.file_uploader(
