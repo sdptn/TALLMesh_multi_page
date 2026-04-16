@@ -45,7 +45,7 @@ This document tracks implementation errors, causes and resolutions.
 Date: [23/03/2026]
 Author: G.Rubidge
 Change: Removed multi-provider support and standardised to GRAPHIA-only models.
-Reason: Simplification for PCSS deployment and removal of unused proviuders
+Reason: Simplification for PCSS deployment and removal of unused providers
 Impact:
 
 - All model calls now go through GRAPHIA proxy
@@ -77,5 +77,35 @@ Impact:
 
 - External LLM APIs no longer supported
 - Requires GRAPHIA API key configuration
+
+Status: Complete
+
+Date: [15/04/2026]
+Author: G.Rubidge
+Change: Removed "60_🔗_Thematic_Overlap_Map\|70_🧊_Theme-Codes_Icicle\|80_🕸️_Spider_Diagram"
+Reason: Simplification for PCSS deployment and removal of unused visuals
+Impact:
+
+- Stripped back visuals
+
+Status: Complete
+
+Date: [15/04/2026]
+Author: G.Rubidge
+Change: Merged file conversion and project setup
+Reason: Simplification for PCSS deployment and more streamlined user experience
+Impact:
+
+- Adding files now automatically convert in project setup page
+
+Status: Complete
+
+Date: [15/04/2026]
+Author: G.Rubidge
+Change: Removed seperate file conversion page
+Reason: Simplification for PCSS deployment and more streamlined user experience
+Impact:
+
+- No longer a seperate page to convert files into txt files
 
 Status: Complete

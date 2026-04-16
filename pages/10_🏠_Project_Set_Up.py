@@ -5,6 +5,7 @@ from api_key_management import manage_api_keys
 import shutil
 from project_utils import get_projects
 from instructions import project_setup_instructions
+from file_conversion_utils import convert_to_txt
 import stat
 import time #added to hopefully fix project deletion error by allowing for read-only files to be deleted after a small delay
 
@@ -52,30 +53,96 @@ def delete_files(file_paths):
 def handle_file_upload():
     """
     Process uploaded files for a given project.
-    
-    This function saves valid .txt files to the project's data folder and provides
-    feedback messages about the upload process.
 
-    Side effects:
-    - Saves valid files to the project's data folder
-    - Updates session state with success/warning messages about the upload process
+    This function saves .txt files directly and converts other supported files
+    to .txt before saving them into the project's data folder.
     """
-    uploaded = st.session_state.get("uploaded_files")
-    if uploaded:
+    if st.session_state.uploaded_files:
         project_name = st.session_state.selected_project
-        saved_files, invalid_files = save_uploaded_files(uploaded, project_name)
+        saved_files, skipped_files, failed_files = save_or_convert_uploaded_files(
+            st.session_state.uploaded_files, project_name
+        )
+
+        message_parts = []
+
         if saved_files:
-            st.session_state.message = f"Files uploaded successfully: {', '.join(saved_files)}"
+            message_parts.append(
+                f"Files uploaded successfully: {', '.join(saved_files)}"
+            )
+
+        if skipped_files:
+            message_parts.append(
+                f"Skipped files (already exist): {', '.join(skipped_files)}"
+            )
+
+        if failed_files:
+            message_parts.append(
+                f"Failed to process: {', '.join(failed_files)}"
+            )
+
+        st.session_state.message = (
+            "\n\n".join(message_parts)
+            if message_parts
+            else "No new files were uploaded."
+        )
+
+        if failed_files:
+            st.session_state.message_type = "warning"
+        elif saved_files:
             st.session_state.message_type = "success"
         else:
-            st.session_state.message = "No new files were uploaded. They may already exist in the project."
             st.session_state.message_type = "info"
-        if invalid_files:
-            st.session_state.message += f"\n\nWarning: The following files were not uploaded as they are not .txt files: {', '.join(invalid_files)}. Please use the 📤 File Upload and Conversion page (from the side panel) to format these documents (.txt, utf8 encoding) before uploading."
-            st.session_state.message_type = "warning"
+
     else:
         st.session_state.message = "Please select files to upload."
         st.session_state.message_type = "warning"
+
+def save_or_convert_uploaded_files(uploaded_files, project_name):
+    """
+    Save uploaded .txt files directly and convert other files to .txt.
+    
+    Args:
+    uploaded_files (list): List of uploaded file objects from Streamlit's file_uploader
+    project_name (str): Name of the current project
+
+    Returns: 
+    tuple: (saved_files, skipped_files, failed_files)    
+    """  
+
+    data_folder = os.path.join(PROJECTS_DIR, project_name, 'data')
+    saved_files = []
+    skipped_files = []
+    failed_files = []
+
+    for file in uploaded_files:
+        try: 
+            original_name = file.name
+            txt_name = os.path.splitext(original_name)[0] + ".txt"
+            txt_path = os.path.join(data_folder, txt_name)
+
+            # Save txt files directly
+            if original_name.lower().endswith('.txt'):
+                direct_path = os.path.join(data_folder, original_name)
+
+                if os.path.exists(direct_path):
+                    skipped_files.append(original_name)
+                else:
+                    with open(direct_path, "wb") as f:
+                        f.write(file.getbuffer())
+                    saved_files.append(original_name)
+
+            # Convert other files to txt
+            else:
+                if os.path.exists(txt_path):
+                    skipped_files.append(original_name)
+                else:
+                    converted_file = convert_to_txt(file, project_name)
+                    saved_files.append(converted_file)
+
+        except Exception as e:
+            failed_files.append(f"{file.name} ({str})")
+
+    return saved_files, skipped_files, failed_files
 
 # Function to create a new project
 def create_project(project_name):
@@ -97,51 +164,6 @@ def create_project(project_name):
     for folder in FOLDER_ORDER:
         os.makedirs(os.path.join(project_path, folder), exist_ok=True) 
 
-# Function to save uploaded files
-def save_uploaded_files(uploaded_files, project_name):
-    """
-    Save uploaded files to the project's data folder.
-
-    This function processes each uploaded file, saving valid .txt files and
-    tracking invalid files.
-
-    Args:
-    uploaded_files (list): List of uploaded file objects from Streamlit's file_uploader
-    project_name (str): Name of the current project
-
-    Returns:
-    tuple: Lists of saved file names and invalid file names
-
-    Side effects:
-    - Saves valid .txt files to the project's data folder
-    """
-    data_folder = os.path.join(PROJECTS_DIR, project_name, 'data')
-    saved_files = []
-    invalid_files = []
-    for file in uploaded_files:
-        if file.name.lower().endswith('.txt'):
-            file_path = os.path.join(data_folder, file.name)
-            if not os.path.exists(file_path):
-                with open(file_path, "wb") as f:
-                    f.write(file.getbuffer())
-                saved_files.append(file.name)
-        else:
-            invalid_files.append(file.name)
-    return saved_files, invalid_files
-
-# Function to get the list of files in a project
-def get_project_files(project_name):
-    """
-    Retrieve the list of files in a project's data folder.
-
-    Args:
-    project_name (str): Name of the project
-
-    Returns:
-    list: Names of files in the project's data folder
-    """
-    data_folder = os.path.join(PROJECTS_DIR, project_name, 'data')
-    return [f for f in os.listdir(data_folder) if os.path.isfile(os.path.join(data_folder, f))]
 
 # Function to remove files from a project
 def remove_files(project_name, filenames):
@@ -215,7 +237,8 @@ if 'selected_project' not in st.session_state:
 if 'delete_project' not in st.session_state:
     st.session_state.delete_project = None
 
-#if 'uploaded_files' not in st.session_state:
+if 'uploaded_files' not in st.session_state:
+    st.session_state.uploaded_files = None
 #   st.session_state.uploaded_files = None #hopefully f
 
 # ==============================================================================
@@ -333,8 +356,11 @@ def main():
             st.write("No files in this project yet. Upload files below to get started")
         
         # File upload UI
-        st.file_uploader("Upload interviews .txt files", accept_multiple_files=True, key="uploaded_files", on_change=handle_file_upload)
-
+        st.file_uploader(
+            "Upload interviews files (.txt, .pdf, .docx, .rtf and other text files)", 
+            accept_multiple_files=True,  
+            key="uploaded_files", 
+            on_change=handle_file_upload)
         # New expander section for project structure to let users delete files without having to go into file explorer
         with st.expander("View Project Structure & Files"):
             project_structure = get_project_structure(st.session_state.selected_project)
