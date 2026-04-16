@@ -15,7 +15,6 @@ import streamlit as st
 import pandas as pd
 import json
 import re
-from api_key_management import manage_api_keys
 from project_utils import get_projects, get_project_files, get_processed_files, PROJECTS_DIR
 from prompts import reduce_duplicate_codes_pairwise
 from llm_utils import llm_call, graphia_llm_models
@@ -728,7 +727,7 @@ def main():
     else:
         st.write("Please select a project. If none, go to '🏠 Project Set Up' to create one.")
 
-    manage_api_keys()
+
 
 if __name__ == "__main__":
     main()

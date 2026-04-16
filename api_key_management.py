@@ -1,3 +1,12 @@
+import os
+
+def load_api_keys():
+    return {
+        "GRAPHIA_LLM": os.getenv("GRAPHIA_LLM_API_KEY")
+    }
+
+
+"""
 import streamlit as st
 import json
 import os
@@ -9,10 +18,22 @@ API_KEYS_FILE = 'api_keys.json'
 providers = ['GRAPHIA_LLM']
 
 def load_api_keys():
+    api_keys = {}
+
+    # Environment variables take priority
+    if os.getenv("OPENAI_API_KEY"):
+        api_keys["OpenAI"] = os.getenv("OPENAI_API_KEY")
+    
+
+    # Fallback to local file if present
     if os.path.exists(API_KEYS_FILE):
         with open(API_KEYS_FILE, 'r') as f:
-            return json.load(f)
-    return {}
+            file_keys = json.load(f)
+        for provider, key in file_keys.items():
+            if provider not in api_keys:
+                api_keys[provider] = key
+
+    return api_keys
 
 def save_api_keys(api_keys):
     with open(API_KEYS_FILE, 'w') as f:
@@ -49,3 +70,4 @@ def manage_api_keys():
             save_api_keys(st.session_state.api_keys)
             st.sidebar.success(f"API Key for {provider} deleted.")
             st.rerun()
+"""

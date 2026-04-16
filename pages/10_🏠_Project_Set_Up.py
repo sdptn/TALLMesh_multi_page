@@ -1,7 +1,6 @@
 # Import necessary libraries
 import os
 import streamlit as st
-from api_key_management import manage_api_keys
 import shutil
 from project_utils import get_projects
 from instructions import project_setup_instructions
@@ -386,8 +385,6 @@ def main():
         st.session_state.message = None
         st.session_state.message_type = None
 
-    # Call API key saving function
-    manage_api_keys()
 
 # Entry point of the script
 if __name__ == "__main__":

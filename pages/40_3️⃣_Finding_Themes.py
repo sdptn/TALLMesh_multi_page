@@ -13,7 +13,6 @@ import streamlit as st
 import pandas as pd
 import json
 import os
-from api_key_management import manage_api_keys, load_api_keys
 from project_utils import get_projects, get_project_files, get_processed_files
 from prompts import finding_themes_prompts, json_template
 from llm_utils import llm_call, graphia_llm_models
@@ -658,8 +657,6 @@ def main():
     else:
         st.write("Please select a project to continue. If you haven't set up a project yet, head over to the '🏠 Folder Set Up' page to get started.")
 
-    # Manage API keys
-    manage_api_keys()
 
 if __name__ == "__main__":
     main()

@@ -16,7 +16,6 @@ import streamlit as st
 import pandas as pd
 import os
 import plotly.graph_objects as go
-from api_key_management import manage_api_keys
 from project_utils import get_projects
 from instructions import saturation_metric_instructions
 
@@ -132,8 +131,7 @@ def main():
                     st.metric("Unique Pairwise Reduced Codes", unique_codes)
         
 
-    # Manage API keys
-    manage_api_keys()
+
 
 if __name__ == "__main__":
     main()

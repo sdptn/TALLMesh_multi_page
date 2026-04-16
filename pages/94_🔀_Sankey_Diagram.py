@@ -25,7 +25,6 @@ st.logo(logo)
 
 # Custom modules
 from project_utils import get_projects, PROJECTS_DIR, get_processed_files
-from api_key_management import manage_api_keys, load_api_keys
 
 def load_data(project_name):
     """
@@ -397,8 +396,6 @@ def main():
             with st.expander("Show Data Table"):
                 st.dataframe(df_filtered)
     
-    # Manage API keys
-    manage_api_keys()
 
 if __name__ == "__main__":
     main()

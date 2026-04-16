@@ -24,7 +24,7 @@ Note:
 """
 
 import streamlit as st
-from api_key_management import manage_api_keys, load_api_keys
+
 
 # Set logo
 logo = "pages/static/tmeshlogo.png"
@@ -112,59 +112,10 @@ def main():
     #create_finalized_theme_book_guide() # deprecated - finalised theme book now generated in finding themes page automatically
     create_metrics_visualizations_guide()
     create_custom_prompt_management_guide()
-    create_api_key_guide()
 
-    # Call the API key management function
-    manage_api_keys()
+
 
 import streamlit as st
-
-def create_api_key_guide():
-    """
-    Creates an expandable section explaining how to set up API keys from different providers
-    """
-    with st.expander("API Key Setup Guide"):
-        st.header(":orange[Setting Up API Keys]")
-        
-        st.write("""
-        This guide will help you set up API keys for different AI providers. Each provider has a unique process, which we'll walk you through below.
-        """)
-        
-        st.subheader(":orange[1. OpenAI API Key]")
-        st.write("""
-        To set up an OpenAI API key, follow these steps:
-        """)
-        st.video("https://www.youtube.com/watch?v=nafDyRsVnXU")
-        st.write("For a detailed written guide, visit: [How to Get an OpenAI API Key](https://www.howtogeek.com/885918/how-to-get-an-openai-api-key/)")
-        
-        st.subheader(":orange[2. Anthropic API Key]")
-        st.write("""
-        To set up an Anthropic API key, follow these steps:
-        """)
-        st.video("https://www.youtube.com/watch?v=4Tzs4qunYJY")
-        st.write("For more information, check out: [How to Get an Anthropic API Key](https://www.merge.dev/blog/anthropic-api-key)")
-        
-        st.subheader(":orange[3. Azure API Setup]")
-        st.write("""
-        To set up Azure API credentials, follow this video guide:
-        """)
-        st.video("https://www.youtube.com/watch?v=jQyYeYWD97I")
-        st.write("For more information, check out: [How to Get an Azure OpneAI API Key](https://docs.mindmac.app/how-to.../add-api-key/create-azure-openai-api-key)")
-        
-        st.info("""
-        **Note:** Azure API calls work differently from other providers. To manage Azure API credentials, please see the :orange[12_⚙️_Azure_Settings page].
-        """)
-        
-        st.subheader(":orange[Managing Your API Keys]")
-        st.write("""
-        - Once you have your API keys, you can manage them in the sidebar on all pages of this app.
-        - You can add new keys, view existing ones (last few digits only for security), and delete keys as needed.
-        - Always keep your API keys secure and never share them publicly.
-        """)
-        
-        st.warning("""
-        :warning: Remember to handle your API keys with care. They provide access to paid services, so keep them confidential and secure.
-        """)
 
 
 def create_project_setup_guide():
@@ -216,13 +167,10 @@ def create_project_setup_guide():
 
         st.subheader(":orange[6. API Key Management]")
         st.write("""
-        - In the sidebar (on all pages), you'll find options to manage your API keys for different AI providers.
-        - You can add new keys, view existing ones (last few digits only for security), and delete keys as needed.
+        - The PCSS deployment is preconfigured to access the required backend model.
         """)
 
-        st.info("""
-            **Note:** Azure API calls work a little differently to other providers. To manage Azure API credentials please see the :orange[12_⚙️_Azure_Settings page].
-            """)
+        
 
         st.subheader(":orange[Tips]")
         st.write("""

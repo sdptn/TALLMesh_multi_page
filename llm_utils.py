@@ -7,6 +7,7 @@ import json
 import re
 from api_key_management import load_api_keys
 
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -43,7 +44,7 @@ def llm_call(model, full_prompt, model_temperature, model_top_p):
                 keys = load_api_keys()
                 proxy_key = keys.get('GRAPHIA_LLM')
                 if not proxy_key:
-                    st.error("GRAPHIA_LLM Proxy settings are not configured. Please set them up in the API Key Management page.")
+                    st.error("GRAPHIA_LLM is not configured on this deployment. Please contact the administrator.")
                     return None
 
                 client = OpenAI(api_key=proxy_key, base_url="https://llm.graphia-ssh.eu")

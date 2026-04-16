@@ -22,7 +22,6 @@ import pandas as pd
 import plotly.express as px
 import os
 from project_utils import get_projects, PROJECTS_DIR, get_processed_files
-from api_key_management import manage_api_keys, load_api_keys
 
 # Set logo
 logo = "pages/static/tmeshlogo.png"
@@ -184,8 +183,7 @@ def main():
         st.write("Click on the rectangles to zoom in. Double-click to zoom out. Hover for descriptions.")
         st.write("To return to the original view, click in the top left of the visualization or refresh the page.")
 
-    # Manage API keys (this seems out of place and might be better moved to a separate page or function)
-    manage_api_keys()
+
 
 if __name__ == "__main__":
     main()

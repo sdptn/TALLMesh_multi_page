@@ -17,7 +17,6 @@ import os
 import numpy as np
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
-from api_key_management import manage_api_keys
 from project_utils import get_projects, get_project_files, get_processed_files
 
 # Set logo
@@ -265,7 +264,7 @@ def main():
     else:
         st.write("Please select a project to continue.")
 
-    manage_api_keys()
+
 
 if __name__ == "__main__":
     main()

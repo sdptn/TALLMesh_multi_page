@@ -9,7 +9,6 @@ import os
 import pandas as pd
 import json
 import re
-from api_key_management import manage_api_keys
 from prompts import initial_coding_prompts
 from project_utils import get_projects, get_project_files, get_processed_files, PROJECTS_DIR
 from llm_utils import llm_call, graphia_llm_models 
@@ -306,8 +305,7 @@ def main():
     else:
         st.write(f"Please select a project to continue. If you haven't set up a project yet, head over to the '🏠 Project Set Up' page to get started")
 
-    # Call API key management function
-    manage_api_keys()
+
 
 if __name__ == "__main__":
     main()

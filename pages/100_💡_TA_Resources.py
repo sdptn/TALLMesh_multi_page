@@ -11,7 +11,6 @@ The module includes:
 """
 
 import streamlit as st
-from api_key_management import manage_api_keys, load_api_keys
 
 # Set logo
 logo = "pages/static/tmeshlogo.png"
@@ -133,9 +132,6 @@ def main():
     )
 
     render_additional_features()
-
-    # Call API key management function
-    manage_api_keys()
 
 def render_phase(title, braun_clarke_approach, app_approach):
     """
