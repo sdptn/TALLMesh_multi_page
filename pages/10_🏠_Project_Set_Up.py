@@ -2,7 +2,7 @@
 import os
 import streamlit as st
 import shutil
-from project_utils import get_projects
+from project_utils import get_projects, get_user_project_dir, get_project_files, restore_project_from_zip, make_project_zip, clear_user_workspace
 from instructions import project_setup_instructions
 from file_conversion_utils import convert_to_txt
 import stat
@@ -13,12 +13,12 @@ logo = "pages/static/tmeshlogo.png"
 st.logo(logo)
 
 # Define the directory where all projects will be stored
-PROJECTS_DIR = 'projects'
 FOLDER_ORDER = ['data', 'initial_codes', 'pairwise_reduced_codes', 'expanded_pairwise_reduced_codes', 'themes', 'theme_books']
 
 def get_project_structure(project_name):
     structure = {folder: [] for folder in FOLDER_ORDER} # Initialize structure with empty lists for each folder
-    project_path = os.path.join(PROJECTS_DIR, project_name) # Construct the full path to the project folder    
+    base_dir = get_user_project_dir()
+    project_path = os.path.join(base_dir, project_name) # Construct the full path to the project folder    
     for folder in FOLDER_ORDER:
         folder_path = os.path.join(project_path, folder)
         if os.path.exists(folder_path):
@@ -108,7 +108,8 @@ def save_or_convert_uploaded_files(uploaded_files, project_name):
     tuple: (saved_files, skipped_files, failed_files)    
     """  
 
-    data_folder = os.path.join(PROJECTS_DIR, project_name, 'data')
+    base_dir = get_user_project_dir()
+    data_folder = os.path.join(base_dir, project_name, 'data')
     saved_files = []
     skipped_files = []
     failed_files = []
@@ -139,7 +140,7 @@ def save_or_convert_uploaded_files(uploaded_files, project_name):
                     saved_files.append(converted_file)
 
         except Exception as e:
-            failed_files.append(f"{file.name} ({str})")
+            failed_files.append(f"{file.name} ({str(e)})")
 
     return saved_files, skipped_files, failed_files
 
@@ -157,7 +158,8 @@ def create_project(project_name):
     Side effects:
     - Creates a new folder structure in the PROJECTS_DIR
     """
-    project_path = os.path.join(PROJECTS_DIR, project_name)
+    base_dir = get_user_project_dir()
+    project_path = os.path.join(base_dir, project_name)
     os.makedirs(project_path, exist_ok=True)
     
     for folder in FOLDER_ORDER:
@@ -177,7 +179,8 @@ def remove_files(project_name, filenames):
     - Deletes specified files from the project's data folder
     """
     for filename in filenames:
-        file_path = os.path.join(PROJECTS_DIR, project_name, 'data', filename)
+        base_dir = get_user_project_dir()
+        file_path = os.path.join(base_dir, project_name, 'data', filename)
         if os.path.exists(file_path):
             os.remove(file_path)
 
@@ -197,7 +200,8 @@ def remove_project(project_name):
     - Updates session state variables
     - Sets success/error messages in session state
     """
-    project_path = os.path.join(PROJECTS_DIR, project_name)
+    base_dir = get_user_project_dir()
+    project_path = os.path.join(base_dir, project_name)
     if os.path.exists(project_path):
         try: 
             # shutil.rmtree(project_path) #Error not allowing deletion of projects
@@ -348,7 +352,8 @@ def main():
                 st.subheader(f":file_folder: {folder}")
                 if files:
                     for file in files:
-                        file_path = os.path.join(PROJECTS_DIR, st.session_state.selected_project, folder, file)
+                        base_dir = get_user_project_dir()
+                        file_path = os.path.join(base_dir, st.session_state.selected_project, folder, file)
                         if st.checkbox(f":page_facing_up: {file}", key=f"checkbox_{file_path}"):
                             files_to_delete.append(file_path)
                 else:
@@ -384,6 +389,53 @@ def main():
         # Clear the message after displaying
         st.session_state.message = None
         st.session_state.message_type = None
+        st.divider()
+    
+    st.subheader("Resume Existing Project")
+
+    uploaded_zip = st.file_uploader(
+        "Upload a TALLMesh project bundle (.zip)",
+        type=["zip"],
+        key="project_bundle_upload"
+    )
+
+    if uploaded_zip and st.button("Restore Project Bundle"):
+        try:
+            restore_project_from_zip(uploaded_zip)
+            st.success("Project restored successfully.")
+            st.session_state.projects = get_projects()
+            st.rerun()
+        except Exception as e:
+            st.error(f"Could not restore project: {e}")
+
+    st.divider()
+    st.subheader("Export / Clear Workspace")
+
+    if st.session_state.selected_project:
+        if st.button("Prepare Project Bundle"):
+            zip_path = make_project_zip(st.session_state.selected_project)
+
+            with open(zip_path, "rb") as f:
+                st.download_button(
+                    label="Download Project Bundle",
+                    data=f,
+                    file_name=f"{st.session_state.selected_project}.zip",
+                    mime="application/zip"
+                )
+    else:
+        st.info("Select a project to export it as a bundle.")
+
+    confirm_delete = st.checkbox(
+        "I confirm I have downloaded anything I need.",
+        key="confirm_clear_workspace"
+    )
+
+    if confirm_delete and st.button("Clear My Workspace"):
+        clear_user_workspace()
+        st.session_state.projects = get_projects()
+        st.session_state.selected_project = None
+        st.success("Workspace cleared.")
+        st.rerun()
 
 
 # Entry point of the script

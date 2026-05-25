@@ -31,7 +31,7 @@ logger = logging.getLogger(__name__)
 
 
 # Constants
-PROJECTS_DIR = 'projects'
+from project_utils import get_user_project_dir
 
 def load_custom_prompts():
     """
@@ -261,7 +261,8 @@ def process_codes(selected_files, model, prompt, model_temperature, model_top_p,
                         return parsed_output, preprocessed_df, None
                     else:
                         # Save unassigned codes to a separate file
-                        unassigned_folder = os.path.join(PROJECTS_DIR, st.session_state.selected_project, 'unassigned_codes')
+                        base_dir = get_user_project_dir()
+                        unassigned_folder = os.path.join(base_dir, st.session_state.selected_project, 'unassigned_codes')
                         os.makedirs(unassigned_folder, exist_ok=True)
                         timestamp = pd.Timestamp.now().strftime('%Y%m%d_%H%M%S')
                         unassigned_file = os.path.join(unassigned_folder, f'unassigned_codes_{timestamp}.csv')
@@ -300,7 +301,8 @@ def process_codes(selected_files, model, prompt, model_temperature, model_top_p,
                         parsed_output['themes'].append(new_theme)
                     return parsed_output, preprocessed_df, None
                 else:
-                    unassigned_folder = os.path.join(PROJECTS_DIR, st.session_state.selected_project, 'unassigned_codes')
+                    base_dir = get_user_project_dir()
+                    unassigned_folder = os.path.join(base_dir, st.session_state.selected_project, 'unassigned_codes')
                     os.makedirs(unassigned_folder, exist_ok=True)
                     timestamp = pd.Timestamp.now().strftime('%Y%m%d_%H%M%S')
                     unassigned_file = os.path.join(unassigned_folder, f'unassigned_codes_{timestamp}.csv')
@@ -327,7 +329,8 @@ def save_themes(project_name, df):
     Returns:
         str: The path to the saved themes file.
     """
-    themes_folder = os.path.join(PROJECTS_DIR, project_name, 'themes')
+    base_dir = get_user_project_dir()
+    themes_folder = os.path.join(base_dir, project_name, 'themes')
     os.makedirs(themes_folder, exist_ok=True)
     
     output_file_path = os.path.join(themes_folder, f"themes_{pd.Timestamp.now().strftime('%Y%m%d_%H%M%S')}.csv")
@@ -381,8 +384,9 @@ def load_data(project_name):
     tuple: A tuple containing two pandas DataFrames (themes_df, codes_df) or (None, None) if files are not found.
     """
     # Define paths for themes and codes folders
-    themes_folder = os.path.join(PROJECTS_DIR, project_name, 'themes')
-    codes_folder = os.path.join(PROJECTS_DIR, project_name, 'pairwise_reduced_codes')
+    base_dir = get_user_project_dir()
+    themes_folder = os.path.join(base_dir, project_name, 'themes')
+    codes_folder = os.path.join(base_dir, project_name, 'pairwise_reduced_codes')
     
     # Get the most recent themes file
     themes_files = get_processed_files(project_name, 'themes')
@@ -489,7 +493,8 @@ def main():
                 col1.write(file)
                 file_checkboxes[file] = col2.checkbox(".", key=f"checkbox_{file}", value=select_all, label_visibility="hidden")
 
-        selected_files = [os.path.join(PROJECTS_DIR, selected_project, 'pairwise_reduced_codes', file) for file, checked in file_checkboxes.items() if checked]
+        base_dir = get_user_project_dir()
+        selected_files = [os.path.join(base_dir, selected_project, 'pairwise_reduced_codes', file) for file, checked in file_checkboxes.items() if checked]
 
         st.divider()
         st.subheader(":orange[LLM Settings]")
@@ -610,7 +615,8 @@ def main():
                     st.write(codes_df)
                 
                 # Save the final DataFrame
-                output_folder = os.path.join(PROJECTS_DIR, selected_project, 'theme_books')
+                base_dir = get_user_project_dir()
+                output_folder = os.path.join(base_dir, selected_project, 'theme_books')
                 os.makedirs(output_folder, exist_ok=True)
 
                 # Save condensed theme book
@@ -639,11 +645,12 @@ def main():
                 col1, col2 = st.columns([0.9, 0.1])
                 col1.write(processed_file)
                 if col2.button("Delete", key=f"delete_{processed_file}"):
-                    os.remove(os.path.join(PROJECTS_DIR, selected_project, 'themes', processed_file))
+                    base_dir = get_user_project_dir()
+                    os.remove(os.path.join(base_dir, selected_project, 'themes', processed_file))
                     st.success(f"Deleted {processed_file}")
                     st.rerun()
                 
-                df = pd.read_csv(os.path.join(PROJECTS_DIR, selected_project, 'themes', processed_file))
+                df = pd.read_csv(os.path.join(base_dir, selected_project, 'themes', processed_file))
                 st.write(df)
                 
                 csv = df.to_csv(index=False).encode('utf-8')

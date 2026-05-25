@@ -9,7 +9,7 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-PROJECTS_DIR = 'projects'
+from project_utils import get_user_project_dir
 
 DEFAULT_LOGO_PATH = "pages/static/tmeshlogo.png"
 
@@ -72,7 +72,8 @@ def convert_to_txt(file, project_name: str) -> str:
     """
     file_extension = os.path.splitext(file.name)[1].lower()
     file_name = os.path.splitext(file.name)[0] + ".txt"
-    file_path = os.path.join(PROJECTS_DIR, project_name, "data", file_name)
+    file_path = os.path.join(get_user_project_dir(), project_name, "data", file_name)
+    os.makedirs(os.path.dirname(file_path), exist_ok=True)
 
     try:
         if file_extension == '.pdf':

@@ -15,7 +15,7 @@ import streamlit as st
 import pandas as pd
 import json
 import re
-from project_utils import get_projects, get_project_files, get_processed_files, PROJECTS_DIR
+from project_utils import get_projects, get_project_files, get_processed_files, get_user_project_dir
 from prompts import reduce_duplicate_codes_pairwise
 from llm_utils import llm_call, graphia_llm_models
 import logging
@@ -57,7 +57,8 @@ def save_expanded_reduced_codes(project_name, df):
     expanded_df = pd.DataFrame(expanded_rows)
     
     # Save to expanded_reduced_codes folder
-    output_folder = os.path.join(PROJECTS_DIR, project_name, 'expanded_pairwise_reduced_codes')
+    base_dir = get_user_project_dir()
+    output_folder = os.path.join(base_dir, project_name, 'expanded_pairwise_reduced_codes')
     os.makedirs(output_folder, exist_ok=True)
     output_file = os.path.join(output_folder, f"expanded_pairwise_reduced_codes_{pd.Timestamp.now().strftime('%Y%m%d_%H%M%S')}.csv")
     expanded_df.to_csv(output_file, index=False)
@@ -472,7 +473,8 @@ def amalgamate_duplicate_codes(df):
 
 def save_reduced_codes(project_name, df, folder):
     """Save reduced codes to CSV file"""
-    reduced_codes_folder = os.path.join(PROJECTS_DIR, project_name, folder)
+    base_dir = get_user_project_dir()
+    reduced_codes_folder = os.path.join(base_dir, project_name, folder)
     os.makedirs(reduced_codes_folder, exist_ok=True)
     output_file_path = os.path.join(reduced_codes_folder, f"pairwise_reduced_codes_{pd.Timestamp.now().strftime('%Y%m%d_%H%M%S')}.csv")
     df.to_csv(output_file_path, index=False, encoding='utf-8')
@@ -545,8 +547,8 @@ def main():
                 col1, col2 = st.columns([0.9, 0.2])
                 col1.write(file)
                 file_checkboxes[file] = col2.checkbox(".", key=f"checkbox_{file}", value=select_all, label_visibility="hidden")
-
-        selected_files = [os.path.join(PROJECTS_DIR, selected_project, 'initial_codes', file) 
+        base_dir = get_user_project_dir()
+        selected_files = [os.path.join(base_dir, selected_project, 'initial_codes', file) 
                          for file, checked in file_checkboxes.items() if checked]
 
         if len(selected_files) < 2:
@@ -698,7 +700,8 @@ def main():
                     st.error("Failed to reduce codes. Check logs for more info.")
 
         # Display saved files
-        pairwise_folder = os.path.join(PROJECTS_DIR, selected_project, 'pairwise_reduced_codes')
+        base_dir = get_user_project_dir()
+        pairwise_folder = os.path.join(base_dir, selected_project, 'pairwise_reduced_codes')
         if os.path.exists(pairwise_folder):
             processed_files_list = get_processed_files(selected_project, 'pairwise_reduced_codes')
             with st.expander("Saved Pairwise Reduced Codes", expanded=False):
@@ -706,10 +709,10 @@ def main():
                     col1, col2 = st.columns([0.9, 0.1])
                     col1.write(processed_file)
                     if col2.button("Delete", key=f"delete_{processed_file}"):
-                        os.remove(os.path.join(PROJECTS_DIR, selected_project, 'pairwise_reduced_codes', processed_file))
+                        os.remove(os.path.join(base_dir, selected_project, 'pairwise_reduced_codes', processed_file))
                         st.success(f"Deleted {processed_file}")
                         st.rerun()
-                    df = pd.read_csv(os.path.join(PROJECTS_DIR, selected_project, 'pairwise_reduced_codes', processed_file))
+                    df = pd.read_csv(os.path.join(base_dir, selected_project, 'pairwise_reduced_codes', processed_file))
                     df['quote'] = df['quote'].apply(format_quotes)
                     df['original_code'] = df['original_code'].apply(format_original_codes)
                     st.write(df)

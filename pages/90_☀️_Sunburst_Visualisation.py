@@ -23,7 +23,7 @@ logo = "pages/static/tmeshlogo.png"
 st.logo(logo)
 
 # Custom modules
-from project_utils import get_projects, PROJECTS_DIR, get_processed_files
+from project_utils import get_projects, get_user_project_dir, get_processed_files
 
 def load_data(project_name):
     """
@@ -36,8 +36,9 @@ def load_data(project_name):
         pd.DataFrame: A pandas DataFrame containing the hierarchical data.
                       Returns None if no data is available.
     """
-    themes_folder = os.path.join(PROJECTS_DIR, project_name, 'theme_books')
-    codes_folder = os.path.join(PROJECTS_DIR, project_name, 'expanded_pairwise_reduced_codes')
+    base_dir = get_user_project_dir()
+    themes_folder = os.path.join(base_dir, project_name, 'theme_books')
+    codes_folder = os.path.join(base_dir, project_name, 'expanded_pairwise_reduced_codes')
     
     # Load themes data
     themes_files = get_processed_files(project_name, 'theme_books')

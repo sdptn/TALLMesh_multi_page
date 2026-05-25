@@ -21,7 +21,7 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import os
-from project_utils import get_projects, PROJECTS_DIR, get_processed_files
+from project_utils import get_projects, get_user_project_dir, get_processed_files
 
 # Set logo
 logo = "pages/static/tmeshlogo.png"
@@ -42,8 +42,9 @@ def load_data(project_name):
     in the project's directory structure. It then loads these files into pandas DataFrames.
     """
     # Define paths for themes and codes folders
-    themes_folder = os.path.join(PROJECTS_DIR, project_name, 'theme_books')
-    codes_folder = os.path.join(PROJECTS_DIR, project_name, 'expanded_pairwise_reduced_codes')
+    base_dir = get_user_project_dir()
+    themes_folder = os.path.join(base_dir, project_name, 'theme_books')
+    codes_folder = os.path.join(base_dir, project_name, 'expanded_pairwise_reduced_codes')
     
     # Get list of theme files and filter for 'expanded' themes
     themes_files = get_processed_files(project_name, 'theme_books')

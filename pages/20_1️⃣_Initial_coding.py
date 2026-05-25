@@ -10,7 +10,7 @@ import pandas as pd
 import json
 import re
 from prompts import initial_coding_prompts
-from project_utils import get_projects, get_project_files, get_processed_files, PROJECTS_DIR
+from project_utils import get_projects, get_project_files, get_processed_files, get_user_project_dir
 from llm_utils import llm_call, graphia_llm_models 
 import logging
 import tooltips
@@ -34,7 +34,9 @@ def load_custom_prompts():
         return {}
 
 def save_uploaded_files(uploaded_files, project_name):
-    data_folder = os.path.join(PROJECTS_DIR, project_name, 'data')
+    base_dir = get_user_project_dir()
+    data_folder = os.path.join(base_dir, project_name, 'data')
+    os.makedirs(data_folder, exist_ok=True)
     saved_files = []
     for file in uploaded_files:
         file_path = os.path.join(data_folder, file.name)
@@ -45,7 +47,8 @@ def save_uploaded_files(uploaded_files, project_name):
     return saved_files
 
 def save_initial_codes(project_name, file_name, df):
-    initial_codes_folder = os.path.join(PROJECTS_DIR, project_name, 'initial_codes')
+    base_dir = get_user_project_dir()
+    initial_codes_folder = os.path.join(base_dir, project_name, 'initial_codes')
     os.makedirs(initial_codes_folder, exist_ok=True)
     
     file_name_stripped = str(os.path.splitext(file_name)[0])
@@ -246,7 +249,8 @@ def main():
             prog_bar = st.progress(0)
             if selected_files and prompt_input:
                 for i, file in enumerate(selected_files):
-                    file_path = os.path.join(PROJECTS_DIR, selected_project, 'data', file)
+                    base_dir = get_user_project_dir()
+                    file_path = os.path.join(base_dir, selected_project, 'data', file)
                     try:
                         status_message.info(f"Processing file {i+1}/{len(selected_files)}: {file}")
                         processed_output = process_file(file_path, actual_model, prompt_input, model_temperature, model_top_p, status_message)
@@ -288,11 +292,12 @@ def main():
                 col1, col2 = st.columns([0.9, 0.1])
                 col1.write(processed_file)
                 if col2.button("Delete", key=f"delete_{processed_file}"):
-                    os.remove(os.path.join(PROJECTS_DIR, selected_project, 'initial_codes', processed_file))
+                    base_dir = get_user_project_dir()
+                    os.remove(os.path.join(base_dir, selected_project, 'initial_codes', processed_file))
                     st.success(f"Deleted {processed_file}")
                     st.rerun()
-                
-                df = pd.read_csv(os.path.join(PROJECTS_DIR, selected_project, 'initial_codes', processed_file))
+                base_dir = get_user_project_dir()
+                df = pd.read_csv(os.path.join(base_dir, selected_project, 'initial_codes', processed_file))
                 st.write(df)
                 
                 csv = df.to_csv(index=False).encode('utf-8')

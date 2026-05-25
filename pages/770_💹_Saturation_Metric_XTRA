@@ -24,7 +24,7 @@ logo = "pages/static/tmeshlogo.png"
 st.logo(logo)
 
 # Constants
-PROJECTS_DIR = 'projects'
+from project_utils import get_user_project_dir
 
 def calculate_rolling_its(unique_counts, total_counts):
     """
@@ -203,7 +203,8 @@ def main():
         st.rerun()
 
     if selected_project != "Select a project...":
-        results_file = os.path.join(PROJECTS_DIR, selected_project, 'code_reduction_results.csv')
+        base_dir = get_user_project_dir()
+        results_file = os.path.join(base_dir, selected_project, 'code_reduction_results.csv')
 
         if os.path.exists(results_file):
             with st.spinner("Processing..."):

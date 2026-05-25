@@ -20,7 +20,7 @@ from project_utils import get_projects
 from instructions import saturation_metric_instructions
 
 # Constants
-PROJECTS_DIR = 'projects'
+from project_utils import get_user_project_dir
 
 # Set logo
 logo = "pages/static/tmeshlogo.png"
@@ -28,7 +28,8 @@ st.logo(logo)
 
 def count_total_initial_codes(project_name):
     """Count total rows across all initial coding CSV files."""
-    folder = os.path.join(PROJECTS_DIR, project_name, 'initial_codes')
+    base_dir = get_user_project_dir()
+    folder = os.path.join(base_dir, project_name, 'initial_codes')
     if not os.path.exists(folder):
         return 0
 
@@ -42,7 +43,8 @@ def count_total_initial_codes(project_name):
 
 def get_latest_pairwise_reduced_count(project_name):
     """Get row count from the most recent pairwise reduced codes file."""
-    folder = os.path.join(PROJECTS_DIR, project_name, 'pairwise_reduced_codes')
+    base_dir = get_user_project_dir()
+    folder = os.path.join(base_dir, project_name, 'pairwise_reduced_codes')
     if not os.path.exists(folder):
         return 0, None
 
