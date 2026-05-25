@@ -12,10 +12,6 @@ It uses streamlit for the GUI elements, and for the analysis it uses code and id
 
 4. [📃 Mathis, W. S., Zhao, S., Pratt, N., Weleff, J., & De Paoli, S. (2024). *Inductive thematic analysis of healthcare qualitative interviews using open-source large language models: How does it compare to traditional methods?* PubMed.](https://pubmed.ncbi.nlm.nih.gov/39067136/)
 
-## Discord
-
-https://discord.com/invite/HmdEyE3x
-
 ## Table of Contents
 
 1. [Introduction](#introduction)
@@ -37,7 +33,7 @@ This project is based on research conducted by Prof. Stefano De Paoli and Dr. Da
 ## Features
 
 - Project-based organization for managing multiple analyses
-- Support for multiple LLM providers (OpenAI, Anthropic, Azure)
+- Support for PCSS LLMs TBC
 - Streamlined workflow emulating phases 2, 3, and 4 of Braun & Clarke's six-phase approach:
   1. Familiarization with data
   2. Initial coding
@@ -45,8 +41,8 @@ This project is based on research conducted by Prof. Stefano De Paoli and Dr. Da
   4. Reviewing themes
   5. Defining and naming themes
   6. Producing the report
-- Interactive visualizations including icicle charts and thematic network maps
-- Calculation of Inductive Thematic Saturation (ITS) metric
+- Interactive visualizations including TBC
+- Calculation of Inductive Thematic Saturation (ITS) metric TBC
 - Flexible prompt engineering for each analysis phase
 - Export options for codes, themes, and visualizations
 
@@ -54,11 +50,11 @@ This project is based on research conducted by Prof. Stefano De Paoli and Dr. Da
 
 - Project Set Up
 
-Use this page to set up your project and add. [video to come]
+Use this page to set up your project and add. [video to come]TBC
 
 - Initial Coding
 
-This page emulates Braun & Clarke's phase 2, in which initial codes are derived from each uploaded .txt file
+This page emulates Braun & Clarke's phase 2, in which initial codes are derived from each uploaded file
 
 - Reduction of Codes
 
@@ -68,27 +64,46 @@ This stage involves the reduction of duplicate codes to yield a list of unique c
 
 During this stage the LLM is tasked with identifying patterns and grouping associated codes together under broader themes.
 
-
-## Local Installation
+## Installation
 
 1. Clone the repository:
 
    ```
    git clone https://github.com/sdptn/TALLMesh_multi_page
    cd TALLMesh_multi_page
+   git checkout deployment/pcss TBC
    ```
 
-2. Create a virtual environment:
+## If running Locally
+
+redirect to the main page 
+
+1. Create a virtual environment:
 
    ```
    python -m venv venv
    source venv/bin/activate  # On Windows use venv\Scripts\activate
    ```
 
-3. Install the required packages:
+2. Install the required packages:
 
    ```
    pip install -r requirements.txt
+   ```
+
+## If running via docker
+
+1. Make sure Docker Desktop is installed <https://www.docker.com/products/docker-desktop/>
+
+2. Build the image:
+
+   ```
+   docker build -t tallmesh-pcss .
+   ```
+3. Build the container
+
+   ```
+   docker run -rm -p 8501:8501 -v "${PWD}/projects:/app/projects" -e GRAPHIA_LLM_API_KEY=your_key_here tallmesh-pcss
    ```
 
 ## Usage
@@ -102,7 +117,6 @@ During this stage the LLM is tasked with identifying patterns and grouping assoc
 2. Follow the on-screen instructions to:
    - Set up a new project
    - Upload and manage your data files
-   - Configure API keys for LLM providers
    - Perform each phase of the thematic analysis
    - Generate visualizations and reports
 
@@ -135,19 +149,11 @@ For a simpler deployment option without setting up a local environment, you can 
 - `4_3️⃣_Finding_Themes.py`: Theme identification
 - `5_💹_Saturation_Metric.py`: Calculation of saturation metrics
 - `6_🔗_Thematic_Overlap_Map.py`: Thematic network visualization
-- `7_🧊_Theme-Codes_Icicle.py`: Icicle chart visualization
-- `8_🕸️_Spider_Diagram.py`: Spider diagram visualisation
+- `90_☀️_Sunburst_Visualisation.py`: Sunburt visualization
 - `9_🌳_Nested_Treemap.py`: Nested treemap visualisation
-- `10_💡_Resources.py`: Overview of Thematic Analysis & Comparison
-- `11_⚙️_Azure_Settings.py`: Manage Azure API credentials
+- `10_💡_TA_Resources.py`: Overview of Thematic Analysis & Comparison
 - `12_📌_Guide.py`: User guide
 - `13_📢_Prompt Settings.py`: Prompt configuration settings page
-- `14_📤_File_Upload_and_Conversion.py`: Convert docs (PDF, DOCX) to.txt 
-
-## Configuration
-
-1. API Keys: Use the sidebar in the application to manage API keys for different LLM providers.
-2. Azure Settings: If using Azure, configure the deployment settings in the application (there is a dedicated page for Azure settings)
 
 ## Contributing
 
@@ -184,3 +190,14 @@ For questions or suggestions, please contact the project PI: [Prof. Stefano De P
 ## Citation
 
 De Paoli S. and Fawzi A. (2025). TALLMesh (0.1) [Computer software]. GitHub. URL: https://github.com/sdptn/TALLMesh_multi_page
+
+docker build -t tallmesh-pcss .
+docker run --rm -p 8501:8501 \
+  -v ./projects:/app/projects \
+  -e GRAPHIA_LLM_API_KEY=sk-... \
+  tallmesh-pcss
+
+docker run --rm -p 8501:8501 `
+-v "${PWD}\projects:/app/projects" `
+--env-file .env `
+tallmesh-pcss
