@@ -16,46 +16,46 @@ import streamlit as st
 import pandas as pd
 import os
 import plotly.graph_objects as go
-from api_key_management import manage_api_keys
 from project_utils import get_projects
 from instructions import saturation_metric_instructions
 
 # Constants
-PROJECTS_DIR = 'projects'
+PROJECTS_DIR = "projects"
 
 # Set logo
 logo = "pages/static/tmeshlogo.png"
 st.logo(logo)
 
-def count_rows_in_folder(folder_path):
-    """
-    Count the number of rows in each CSV file within a given folder.
-    
-    Args:
-    folder_path (str): Path to the folder containing CSV files.
-    
-    Returns:
-    list: A list of row counts for each CSV file in the folder.
-    """
-    file_counts = []
-    for filename in sorted(os.listdir(folder_path)):
-        if filename.endswith('.csv'):
-            file_path = os.path.join(folder_path, filename)
-            df = pd.read_csv(file_path)
-            file_counts.append(len(df))
-    return file_counts
+def count_total_initial_codes(project_name):
+    """Count total rows across all initial coding CSV files."""
+    base_dir = PROJECTS_DIR
+    folder = os.path.join(base_dir, project_name, 'initial_codes')
+    if not os.path.exists(folder):
+        return 0
 
-def cumulative_sum(file_counts):
-    """
-    Calculate the cumulative sum of a list of counts.
-    
-    Args:
-    file_counts (list): A list of counts.
-    
-    Returns:
-    list: A list of cumulative sums.
-    """
-    return [sum(file_counts[:i+1]) for i in range(len(file_counts))]
+    total = 0
+    for filename in os.listdir(folder):
+        if filename.endswith('.csv'):
+            file_path = os.path.join(folder, filename)
+            df = pd.read_csv(file_path)
+            total += len(df)
+    return total
+
+def get_latest_pairwise_reduced_count(project_name):
+    """Get row count from the most recent pairwise reduced codes file."""
+    base_dir = PROJECTS_DIR
+    folder = os.path.join(base_dir, project_name, 'pairwise_reduced_codes')
+    if not os.path.exists(folder):
+        return 0, None
+
+    csv_files = [f for f in os.listdir(folder) if f.endswith('.csv')]
+    if not csv_files:
+        return 0, None
+
+    latest_file = max(csv_files, key=lambda f: os.path.getmtime(os.path.join(folder, f)))
+    latest_path = os.path.join(folder, latest_file)
+    df = pd.read_csv(latest_path)
+    return len(df), latest_file
 
 def main():
     """
@@ -65,7 +65,7 @@ def main():
     
     st.write("See our paper on saturation and LLMs (https://arxiv.org/pdf/2401.03239) for more information.")
     
-    st.subheader("This version uses the files from initial coding (to derive total codes) and the files from the reduction of codes (unique codes) stored in your project folder.")
+    st.subheader("This metric reflects the degree of code consolidation following pairwise reduction, and serves as a proxy for saturation.")
 
     # Project selection
     projects = get_projects()
@@ -92,56 +92,48 @@ def main():
         st.rerun()
 
     if selected_project != "Select a project...":
-        results_file = os.path.join(PROJECTS_DIR, selected_project, 'code_reduction_results.csv')
+        with st.spinner("Processing..."):
+            total_codes = count_total_initial_codes(selected_project)
+            unique_codes, latest_pairwise_file = get_latest_pairwise_reduced_count(selected_project)
 
-        if os.path.exists(results_file):
-            with st.spinner("Processing..."):
-                # Read the results file
-                results_df = pd.read_csv(results_file)
-                
-                # Extract unique and total code counts
-                unique_counts = results_df['unique_codes'].tolist()
-                total_counts = results_df['total_codes'].tolist()
+            if total_codes == 0:
+                st.error("No initial coding files found. Please run initial coding first.")
+            elif unique_codes == 0:
+                st.error("No pairwise reduced codes file found. Please run pairwise reduction first.")
+            else:
+                its_metric = round(unique_codes / total_codes, 3)
 
-                st.success("Files processed successfully!")
-
-                # Calculate ITS Metric (Saturation)
-                its_metric = round(unique_counts[-1] / total_counts[-1], 3)
-                
-                # Display ITS Metric
                 col1, col2 = st.columns(2)
                 with col1:
                     st.subheader(":orange[ITS Metric (Saturation):]")
                 with col2:
                     st.subheader(f":green[{its_metric}]")
 
+                st.write(f"Latest pairwise reduced file used: {latest_pairwise_file}")
+                st.success("Files processed successfully!")
+
                 # Create plot
                 fig = go.Figure()
-                fig.add_trace(go.Scatter(x=list(range(1, len(unique_counts) + 1)), y=unique_counts, mode='lines+markers', name='Unique Codes', line=dict(color='red')))
-                fig.add_trace(go.Scatter(x=list(range(1, len(total_counts) + 1)), y=total_counts, mode='lines+markers', name='Total Initial Codes'))
+                fig.add_trace(go.Bar(
+                    x=["Total Initial Codes", "Unique Pairwise Reduced Codes"],
+                    y=[total_codes, unique_codes]
+                ))
                 fig.update_layout(
-                    title='Unique Codes vs Total Codes Cumulative Sum',
-                    xaxis_title='File Index',
-                    yaxis_title='Count',
-                    legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
+                    title="Initial vs Pairwise Reduced Code Counts",
+                    xaxis_title="Code Type",
+                    yaxis_title="Count"
                 )
                 st.plotly_chart(fig)
 
                 # Display data in two columns
                 col1, col2 = st.columns(2)
-                with col2:
-                    st.write("Unique Codes Counts:")
-                    st.write(unique_counts)
                 with col1:
-                    st.write("Total Codes Cumulative Sum:")
-                    st.write(total_counts)
-        else:
-            st.error("Error: Code reduction results file not found. Please run the code reduction process first.")
-    else:
-        st.write("Please select a project to continue.")
+                    st.metric("Total Initial Codes", total_codes)
+                with col2:
+                    st.metric("Unique Pairwise Reduced Codes", unique_codes)
+        
 
-    # Manage API keys
-    manage_api_keys()
+
 
 if __name__ == "__main__":
     main()

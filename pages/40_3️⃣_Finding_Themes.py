@@ -378,7 +378,7 @@ def load_data(project_name):
     """
     # Define paths for themes and codes folders
     themes_folder = os.path.join(PROJECTS_DIR, project_name, 'themes')
-    codes_folder = os.path.join(PROJECTS_DIR, project_name, 'reduced_codes')
+    codes_folder = os.path.join(PROJECTS_DIR, project_name, 'expanded_pairwise_reduced_codes')
     
     # Get the most recent themes file
     themes_files = get_processed_files(project_name, 'themes')
@@ -388,7 +388,7 @@ def load_data(project_name):
     themes_df = pd.read_csv(os.path.join(themes_folder, latest_themes_file))
     
     # Get the most recent reduced codes file
-    codes_files = get_processed_files(project_name, 'reduced_codes')
+    codes_files = get_processed_files(project_name, 'expanded_pairwise_reduced_codes')
     if not codes_files:
         return None, None
     latest_codes_file = max(codes_files, key=lambda f: os.path.getmtime(os.path.join(codes_folder, f)))
@@ -425,7 +425,7 @@ def process_data(themes_df, codes_df):
                     'Theme Description': theme_description,
                     'Code': code_row['code'],
                     'Code Description': code_row['description'],
-                    'Merge Explanation': code_row['merge_explanation'],
+                    'Merge Explanation': code_row.get('merge_explanation', ''),
                     'Quotes': code_row.get('quote', code_row.get('source', '')),  # Try 'quote', then 'source' if 'quote' doesn't exist
                     'Source': code_row.get('source', code_row.get('quote_2', ''))  # Try 'source', then 'quote_2' if 'source' doesn't exist
                 })
@@ -473,7 +473,7 @@ def main():
 
     if selected_project != "Select a project...":
         # Get and display project files for selection
-        project_files = get_project_files(selected_project, 'reduced_codes')
+        project_files = get_project_files(selected_project, 'expanded_pairwise_reduced_codes')
         
         with st.expander("Select files to process", expanded=True):
             col1, col2 = st.columns([0.9, 0.2])
@@ -485,7 +485,7 @@ def main():
                 col1.write(file)
                 file_checkboxes[file] = col2.checkbox(".", key=f"checkbox_{file}", value=select_all, label_visibility="hidden")
 
-        selected_files = [os.path.join(PROJECTS_DIR, selected_project, 'reduced_codes', file) for file, checked in file_checkboxes.items() if checked]
+        selected_files = [os.path.join(PROJECTS_DIR, selected_project, 'expanded_pairwise_reduced_codes', file) for file, checked in file_checkboxes.items() if checked]
 
         st.divider()
         st.subheader(":orange[LLM Settings]")

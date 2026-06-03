@@ -48,7 +48,7 @@ def load_data(project_name):
                Returns (None, None) if no data is available.
     """
     themes_folder = os.path.join(PROJECTS_DIR, project_name, 'theme_books')
-    codes_folder = os.path.join(PROJECTS_DIR, project_name, 'expanded_reduced_codes')
+    codes_folder = os.path.join(PROJECTS_DIR, project_name, 'expanded_pairwise_reduced_codes')
     
     # Load themes data
     themes_files = get_processed_files(project_name, 'theme_books')
@@ -59,7 +59,7 @@ def load_data(project_name):
     themes_df = pd.read_csv(os.path.join(themes_folder, latest_themes_file))
     
     # Load codes data
-    codes_files = get_processed_files(project_name, 'expanded_reduced_codes')
+    codes_files = get_processed_files(project_name, 'expanded_pairwise_reduced_codes')
     if not codes_files:
         return None, None
     latest_codes_file = max(codes_files, key=lambda f: os.path.getmtime(os.path.join(codes_folder, f)))
