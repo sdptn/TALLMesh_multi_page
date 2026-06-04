@@ -491,8 +491,7 @@ def main():
         st.subheader(":orange[LLM Settings]")
 
         # Model selection
-        azure_models = get_azure_models()
-        model_options = default_models + azure_models + blablador_models + elm_models
+        model_options = elm_models
         selected_model = st.selectbox("Select Model", model_options, help=tooltips.model_tooltip)
 
         max_temperature_value = 2.0 if selected_model.startswith('gpt') else 1.0

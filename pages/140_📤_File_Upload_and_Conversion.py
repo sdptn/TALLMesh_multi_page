@@ -257,3 +257,14 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+def convert_pdf_to_txt(pdf_file, output_path):
+    document = fitz.open(stream=pdf_file.getvalue(), filetype="pdf")
+    text = ""
+
+    for page_num in range(len(document)):
+        page = document[page_num]
+        text += page.get_text()
+
+    with open(output_path, 'w', encoding='utf-8') as txt_file:
+        txt_file.write(text)
