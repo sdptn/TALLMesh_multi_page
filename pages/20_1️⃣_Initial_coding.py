@@ -221,8 +221,7 @@ def main():
         st.subheader(":orange[LLM Settings]")
         
         # Model selection
-        azure_models = get_azure_models()
-        model_options = default_models + azure_models + blablador_models + elm_models # default models imported from llm_utils # Ari Thomson added, blablador models is also imported from llm_utils # Georgia added ELM models, also imported from llm_utils
+        model_options = elm_models
         selected_model = st.selectbox("Select Model", model_options, help = tooltips.model_tooltip)
         
         # OpenAI & Anthropic Models have different max temperature settings (2 & 1, respectively)

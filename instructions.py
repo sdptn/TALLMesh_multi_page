@@ -72,10 +72,6 @@ def project_setup_instructions():
         - You can add new keys, view existing ones (last few digits only for security), and delete keys as needed.
         """)
 
-        st.info("""
-            **Note:** The Azure API works a little differently to other providers. To manage Azure API credentials please see the :orange[⚙️_Azure_Settings page].
-        """)
-
         # Tips
         st.subheader(":orange[Tips]")
         st.write("""
