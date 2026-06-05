@@ -59,9 +59,10 @@ def handle_file_upload():
     - Saves valid files to the project's data folder
     - Updates session state with success/warning messages about the upload process
     """
-    if st.session_state.uploaded_files:
+    uploaded_files = st.session_state.get("uploaded_files")
+    if uploaded_files:
         project_name = st.session_state.selected_project
-        saved_files, invalid_files = save_uploaded_files(st.session_state.uploaded_files, project_name)
+        saved_files, invalid_files = save_uploaded_files(uploaded_files, project_name)
         if saved_files:
             st.session_state.message = f"Files uploaded successfully: {', '.join(saved_files)}"
             st.session_state.message_type = "success"
@@ -228,8 +229,8 @@ if 'selected_project' not in st.session_state:
 if 'delete_project' not in st.session_state:
     st.session_state.delete_project = None
 
-if 'uploaded_files' not in st.session_state:
-    st.session_state.uploaded_files = None
+#if 'uploaded_files' not in st.session_state:
+#    st.session_state.uploaded_files = None
 
 # ==============================================================================
 #                             MAIN STREAMLIT FUNCTION

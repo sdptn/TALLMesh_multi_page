@@ -523,7 +523,6 @@ def main():
 
         #settings_col3, settings_col4 = st.columns([0.5, 0.5])
         #with settings_col3:
-        include_quotes = st.checkbox(label="Include Quotes", value=False, help='Choose whether to send quotes to the LLM during the theme-generating process. This setting is :orange[off] by default; if you do choose to include quotes, check you are adhering to data privacy policies')
         #with settings_col4:
         force_theme_assignment = st.checkbox(label="Force Unassigned Codes to Themes", value=False, help='If checked, any codes that remain unassigned after LLM processing will be converted to individual themes. If unchecked (default and recommended), unassigned codes will be saved separately for manual review.')
 
@@ -534,7 +533,7 @@ def main():
                 # Process the selected files and display results
                 themes_output, processed_df, unassigned_codes = process_codes(
                     selected_files, selected_model, prompt_input, 
-                    model_temperature, model_top_p, include_quotes, 
+                    model_temperature, model_top_p, 
                     force_theme_assignment
                 )
                 

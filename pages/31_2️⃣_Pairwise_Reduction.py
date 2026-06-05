@@ -613,12 +613,6 @@ def main():
                 help=tooltips.top_p_tooltip
             )
 
-        include_quotes = st.checkbox(
-            label="Include Quotes",
-            value=False,
-            help='Include quotes in comparisons for more context.'
-        )
-
         include_merge_explanation = st.checkbox(
             label="Include merge explanation in merges",
             value=True,
@@ -640,7 +634,7 @@ def main():
                 prompt=prompt_input,
                 model_temperature=model_temperature,
                 model_top_p=model_top_p,
-                include_quotes=include_quotes
+                
             )
             
             # Reduce based on similarities
@@ -650,7 +644,6 @@ def main():
                 model=selected_model,
                 model_temperature=model_temperature,
                 model_top_p=model_top_p,
-                include_quotes=include_quotes,
                 include_merge_explanation=include_merge_explanation
             )
             
