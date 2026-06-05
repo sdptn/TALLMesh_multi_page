@@ -1,5 +1,7 @@
 # TALLMesh: Thematic Analysis with Large Language Models
 
+This version has been created for the SGSSS Summer School 2026.
+
 TALLMesh is an experimental tool that leverages AI assistance to conduct qualitative analysis on text-based data, specifically emulating stages from the Braun & Clarke approach to inductive thematic analysis.
 
 It uses streamlit for the GUI elements, and for the analysis it uses code and ideas from these papers:
@@ -11,10 +13,6 @@ It uses streamlit for the GUI elements, and for the analysis it uses code and id
 3. [📃 De Paoli, S. (2024). *Further Explorations on the Use of Large Language Models for Thematic Analysis. Open-Ended Prompts, Better Terminologies and Thematic Maps*. Forum: Qualitative Social Research.](https://link.springer.com/article/10.1007/s11135-024-01950-6)
 
 4. [📃 Mathis, W. S., Zhao, S., Pratt, N., Weleff, J., & De Paoli, S. (2024). *Inductive thematic analysis of healthcare qualitative interviews using open-source large language models: How does it compare to traditional methods?* PubMed.](https://pubmed.ncbi.nlm.nih.gov/39067136/)
-
-## Discord
-
-https://discord.com/invite/HmdEyE3x
 
 ## Table of Contents
 
@@ -37,7 +35,7 @@ This project is based on research conducted by Prof. Stefano De Paoli and Dr. Da
 ## Features
 
 - Project-based organization for managing multiple analyses
-- Support for multiple LLM providers (OpenAI, Anthropic, Azure)
+- Support for ELM
 - Streamlined workflow emulating phases 2, 3, and 4 of Braun & Clarke's six-phase approach:
   1. Familiarization with data
   2. Initial coding
@@ -54,7 +52,7 @@ This project is based on research conducted by Prof. Stefano De Paoli and Dr. Da
 
 - Project Set Up
 
-Use this page to set up your project and add. [video to come]
+Use this page to set up your project and add files.
 
 - Initial Coding
 
@@ -68,7 +66,6 @@ This stage involves the reduction of duplicate codes to yield a list of unique c
 
 During this stage the LLM is tasked with identifying patterns and grouping associated codes together under broader themes.
 
-
 ## Local Installation
 
 1. Clone the repository:
@@ -76,6 +73,8 @@ During this stage the LLM is tasked with identifying patterns and grouping assoc
    ```
    git clone https://github.com/sdptn/TALLMesh_multi_page
    cd TALLMesh_multi_page
+   git fetch origin
+   git switch -c workshop/elm-2026 origin/workshop/elm-2026
    ```
 
 2. Create a virtual environment:
@@ -102,7 +101,7 @@ During this stage the LLM is tasked with identifying patterns and grouping assoc
 2. Follow the on-screen instructions to:
    - Set up a new project
    - Upload and manage your data files
-   - Configure API keys for LLM providers
+   - Configure API keys for LLM provider
    - Perform each phase of the thematic analysis
    - Generate visualizations and reports
 
@@ -119,7 +118,7 @@ For a simpler deployment option without setting up a local environment, you can 
    * Sign in with your GitHub account
    * Click "New app"
    * Select your forked repository
-   * Set the main file path to "Tallmesh.py"
+   * Set the main file path to "TALLMesh.py"
    * Click "Deploy"
 
 3. Your application is now live and accessible via the provided Streamlit Cloud URL.
@@ -129,25 +128,22 @@ For a simpler deployment option without setting up a local environment, you can 
 ## Project Structure
 
 - `Thematic_Analysis_LLMs.py`: Main entry point for the Streamlit application
-- `1_🏠_Project_Set_Up.py`: Project and file management
-- `2_1️⃣_Initial_coding.py`: Initial coding phase
-- `3_2️⃣_Reduction_of_codes.py`: Code reduction and consolidation
-- `4_3️⃣_Finding_Themes.py`: Theme identification
-- `5_💹_Saturation_Metric.py`: Calculation of saturation metrics
-- `6_🔗_Thematic_Overlap_Map.py`: Thematic network visualization
-- `7_🧊_Theme-Codes_Icicle.py`: Icicle chart visualization
-- `8_🕸️_Spider_Diagram.py`: Spider diagram visualisation
-- `9_🌳_Nested_Treemap.py`: Nested treemap visualisation
-- `10_💡_Resources.py`: Overview of Thematic Analysis & Comparison
-- `11_⚙️_Azure_Settings.py`: Manage Azure API credentials
-- `12_📌_Guide.py`: User guide
-- `13_📢_Prompt Settings.py`: Prompt configuration settings page
-- `14_📤_File_Upload_and_Conversion.py`: Convert docs (PDF, DOCX) to.txt 
+- `10_🏠_Project_Set_Up.py`: Project and file management
+- `20_1️⃣_Initial_coding.py`: Initial coding phase
+- `31_2️⃣_Pairwise_Reduction.py`: Code reduction and consolidation
+- `40_3️⃣_Finding_Themes.py`: Theme identification
+- `50_💹_Saturation_Metric.py`: Calculation of saturation metrics
+- `60_🔗_Thematic_Overlap_Map.py`: Thematic network visualization
+- `80_🕸️_Spider_Diagram.py`: Spider diagram visualisation
+- `90_🌳_Nested_Treemap.py`: Nested treemap visualisation
+- `100_💡_Resources.py`: Overview of Thematic Analysis & Comparison
+- `120_📌_Guide.py`: User guide
+- `130_📢_Prompt Settings.py`: Prompt configuration settings page
+- `140_📤_File_Upload_and_Conversion.py`: Convert docs (PDF, DOCX) to.txt
 
 ## Configuration
 
 1. API Keys: Use the sidebar in the application to manage API keys for different LLM providers.
-2. Azure Settings: If using Azure, configure the deployment settings in the application (there is a dedicated page for Azure settings)
 
 ## Contributing
 
@@ -171,11 +167,12 @@ THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR I
 
 ## Acknowledgements
 
-- [Prof. Stefano De Paoli](https://www.linkedin.com/in/stefanodepaoli/) and [Alex Fawzi](https://www.linkedin.com/in/alex-fawzi-94710199/) for their research and development of this tool
+- [Prof. Stefano De Paoli](https://www.linkedin.com/in/stefanodepaoli/), [Alex Fawzi](https://www.linkedin.com/in/alex-fawzi-94710199/) and [Georgia Kelly Rubidge](https://www.linkedin.com/in/georgia-kelly-rubidge-070633354/) for their research and development of this tool
 - [Ari Thomson](https://www.linkedin.com/in/ari-alexander-tannahill-thomson/) for writing the code supporting the use of models on [BlaBla Door](https://helmholtz.cloud/services/?serviceID=d7d5c597-a2f6-4bd1-b71e-4d6499d98570)
 - The British Academy for their support with funding for developing the GUI
--  for significant improvements to the first version of the software 
+-  for significant improvements to the first version of the software
 - Virginia Braun and Victoria Clarke for their seminal work on Thematic Analysis
+- The University of Edinburgh for providing the ELM API Llama key
 
 For questions or suggestions, please contact the project PI: [Prof. Stefano De Paoli](mailto:s.depaoli@abertay.ac.uk)
 
