@@ -1,4 +1,4 @@
-FROM python:3.12-slim
+FROM registry.paas.psnc.pl/base/library/python:3.12-slim
 
 WORKDIR /app
 
@@ -15,6 +15,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy app
 COPY . .
+
+#OpenShift permissions
+RUN chgrp -R 0 /app && chmod -R g+rwX /app
 
 # Streamlit port
 EXPOSE 8501
