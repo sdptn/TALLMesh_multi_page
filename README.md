@@ -190,15 +190,3 @@ For questions or suggestions, please contact the project PI: [Prof. Stefano De P
 ## Citation
 
 De Paoli S. and Fawzi A. (2025). TALLMesh (0.1) [Computer software]. GitHub. URL: https://github.com/sdptn/TALLMesh_multi_page
-
-docker build -t tallmesh-pcss .
-docker run --rm -p 8501:8501 \
-  -v ./projects:/app/projects \
-  -e GRAPHIA_LLM_API_KEY=sk-... \
-  tallmesh-pcss
-
-docker run --rm -p 8501:8501 `
--v "${PWD}\projects:/app/projects" `
---env-file .env `
-tallmesh-pcss
-
