@@ -2,6 +2,9 @@ import os
 import streamlit as st
 import json
 import shutil
+from ui_utils import sidebar_data_controls
+
+sidebar_data_controls()
 
 def main():
     # Set page config

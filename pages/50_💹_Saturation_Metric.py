@@ -18,7 +18,9 @@ import os
 import plotly.graph_objects as go
 from project_utils import get_projects
 from instructions import saturation_metric_instructions
+from ui_utils import sidebar_data_controls
 
+sidebar_data_controls()
 # Constants
 from project_utils import get_user_project_dir
 

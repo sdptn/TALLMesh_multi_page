@@ -20,6 +20,9 @@ import logging
 import tooltips
 import time
 from instructions import finding_themes_instructions
+from ui_utils import sidebar_data_controls
+
+sidebar_data_controls()
 
 # Set logo
 logo = "pages/static/tmeshlogo.png"

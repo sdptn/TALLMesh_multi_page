@@ -3,10 +3,12 @@ import os
 import streamlit as st
 import shutil
 from project_utils import get_projects, get_user_project_dir, get_project_files, restore_project_from_zip, make_project_zip, clear_user_workspace
-from instructions import project_setup_instructions
+#from instructions import project_setup_instructions #blocking for now, will remove when tested
 from file_conversion_utils import convert_to_txt
 import stat
 import time #added to hopefully fix project deletion error by allowing for read-only files to be deleted after a small delay
+from ui_utils import sidebar_data_controls
+sidebar_data_controls()
 
 # Set logo
 logo = "pages/static/tmeshlogo.png"
@@ -250,23 +252,32 @@ if 'uploaded_files' not in st.session_state:
 
 # Main function to run the Streamlit app
 def main():
-    """
-    Main function to run the Streamlit application.
 
-    This function sets up the user interface for project management, including:
-    - Creating new projects
-    - Selecting existing projects
-    - Uploading files to projects
-    - Managing existing files in projects
-    - Deleting projects
-    
-    It also handles the display of instruction text and manages the overall flow of the application.
-    """
+    # Main function to run the Streamlit application.
 
-    # Project setyp instructions
-    project_setup_instructions()
+    # This function sets up the user interface for project management, including:
+    # - Creating new projects
+    # - Selecting existing projects
+    # - Uploading files to projects
+    # - Managing existing files in projects
+    # - Deleting projects
     
-    st.write(":green[Select an existing project or create a new one to get started.]")
+    # It also handles the display of instruction text and manages the overall flow of the application.
+   
+
+    # Project setup instructions
+    st.header(":orange[New Project Setup]")
+    with st.expander("Instructions"):
+        st.write("""
+                 Create a new TALLMesh project and upload the files you want to analyse).
+                 
+                 Give your project a unique name, create it, and then upload your interview or qualitative data files below.
+                 """)
+   
+   
+    #project_setup_instructions() #just blocking for now, will remove when tested
+    
+    st.write(":green[Create a new project to get started.]")
     
     # Update projects list at the start of each run
     st.session_state.projects = get_projects()
@@ -299,81 +310,82 @@ def main():
             st.session_state.message = "Invalid project name or project already exists."
             st.session_state.message_type = "error"
 
-    # Project selection UI
-    project_options = ["Select a project..."] + st.session_state.projects
-    index = 0 if st.session_state.selected_project is None else project_options.index(st.session_state.selected_project)
-    selected_project = st.selectbox("Select a project:", project_options, index=index, key="project_selector")
+# # Blocking for now, will remove when tested
+#     # Project selection UI
+#     project_options = ["Select a project..."] + st.session_state.projects
+#     index = 0 if st.session_state.selected_project is None else project_options.index(st.session_state.selected_project)
+#     selected_project = st.selectbox("Select a project:", project_options, index=index, key="project_selector")
     
-    if selected_project != "Select a project...":
-        st.session_state.selected_project = selected_project
-    else:
-        st.session_state.selected_project = None
+#     if selected_project != "Select a project...":
+#         st.session_state.selected_project = selected_project
+#     else:
+#         st.session_state.selected_project = None
 
     # Project management UI
     if st.session_state.selected_project:
         col1, col2 = st.columns([0.88, 0.12])
         col1.subheader(f"Project: {st.session_state.selected_project}")
         
-        # Create a placeholder for the delete button and confirmation
-        delete_placeholder = col2.empty()
+        # # Create a placeholder for the delete button and confirmation #blocking for now, will remove when tested
+        # delete_placeholder = col2.empty()
 
-        # Initialize session state for delete confirmation
-        if 'show_delete_confirm' not in st.session_state:
-            st.session_state.show_delete_confirm = False
+        # # Initialize session state for delete confirmation
+        # if 'show_delete_confirm' not in st.session_state:
+        #     st.session_state.show_delete_confirm = False
 
-        # Show delete button or confirmation based on state
-        if not st.session_state.show_delete_confirm:
-            if delete_placeholder.button("Delete Project"):
-                st.session_state.show_delete_confirm = True
-                st.rerun()
-        else:
-            with delete_placeholder.container():
-                st.button("Cancel", key="cancel_delete", on_click=lambda: setattr(st.session_state, 'show_delete_confirm', False))
-                st.button("Confirm", key="confirm_delete", on_click=lambda: [remove_project(st.session_state.selected_project), setattr(st.session_state, 'selected_project', None), setattr(st.session_state, 'show_delete_confirm', False)])
+        # # Show delete button or confirmation based on state
+        # if not st.session_state.show_delete_confirm:
+        #     if delete_placeholder.button("Delete Project"):
+        #         st.session_state.show_delete_confirm = True
+        #         st.rerun()
+        # else:
+        #     with delete_placeholder.container():
+        #         st.button("Cancel", key="cancel_delete", on_click=lambda: setattr(st.session_state, 'show_delete_confirm', False))
+        #         st.button("Confirm", key="confirm_delete", on_click=lambda: [remove_project(st.session_state.selected_project), setattr(st.session_state, 'selected_project', None), setattr(st.session_state, 'show_delete_confirm', False)])
             
-            st.warning(f"Are you sure you want to delete the project '{st.session_state.selected_project}'? This action cannot be undone.")
+        #     st.warning(f"Are you sure you want to delete the project '{st.session_state.selected_project}'? This action cannot be undone.")
 
-        st.write("Upload files below to get started or manage files in the section below")
+        st.write("Upload files below to get started.")
         
         # File upload UI
         st.file_uploader(
-            "Upload interviews files (.txt, .pdf, .docx, .rtf and other text files)", 
+            "Upload interview files (.txt, .pdf, .docx, .rtf and other text files)", 
             accept_multiple_files=True,  
             key="uploaded_files", 
             on_change=handle_file_upload)
-        # New expander section for project structure to let users delete files without having to go into file explorer
-        with st.expander("View Project Structure & Files"):
-            project_structure = get_project_structure(st.session_state.selected_project)
-            files_to_delete = []  # Move this outside the folder loop
+        # # New expander section for project structure to let users delete files without having to go into file explorer #blocking for now, will remove when tested
+        # with st.expander("View Project Structure & Files"):
+        #     project_structure = get_project_structure(st.session_state.selected_project)
+        #     files_to_delete = []  # Move this outside the folder loop
             
-            # Display files by folder
-            for folder in FOLDER_ORDER:
-                files = project_structure.get(folder, [])
-                st.subheader(f":file_folder: {folder}")
-                if files:
-                    for file in files:
-                        base_dir = get_user_project_dir()
-                        file_path = os.path.join(base_dir, st.session_state.selected_project, folder, file)
-                        if st.checkbox(f":page_facing_up: {file}", key=f"checkbox_{file_path}"):
-                            files_to_delete.append(file_path)
-                else:
-                    st.write("  (empty)")
+        #     # Display files by folder
+        #     for folder in FOLDER_ORDER:
+        #         files = project_structure.get(folder, [])
+        #         st.subheader(f":file_folder: {folder}")
+        #         if files:
+        #             for file in files:
+        #                 base_dir = get_user_project_dir()
+        #                 file_path = os.path.join(base_dir, st.session_state.selected_project, folder, file)
+        #                 if st.checkbox(f":page_facing_up: {file}", key=f"checkbox_{file_path}"):
+        #                     files_to_delete.append(file_path)
+        #         else:
+        #             st.write("  (empty)")
             
-            # Single delete button for all selected files
-            if files_to_delete:
-                col1, col2 = st.columns([0.7, 0.3])
-                with col1:
-                    st.write(f"Selected {len(files_to_delete)} file(s) for deletion")
-                with col2:
-                    if st.button("Delete Selected Files", type="primary", use_container_width=True):
-                        deleted_files = delete_files(files_to_delete)
-                        if deleted_files:
-                            folders_affected = len(set(os.path.dirname(f) for f in deleted_files))
-                            st.success(f"Successfully deleted {len(deleted_files)} file(s) from {folders_affected} folder(s)")
-                            st.rerun()
+        #     # Single delete button for all selected files
+        #     if files_to_delete:
+        #         col1, col2 = st.columns([0.7, 0.3])
+        #         with col1:
+        #             st.write(f"Selected {len(files_to_delete)} file(s) for deletion")
+        #         with col2:
+        #             if st.button("Delete Selected Files", type="primary", use_container_width=True):
+        #                 deleted_files = delete_files(files_to_delete)
+        #                 if deleted_files:
+        #                     folders_affected = len(set(os.path.dirname(f) for f in deleted_files))
+        #                     st.success(f"Successfully deleted {len(deleted_files)} file(s) from {folders_affected} folder(s)")
+        #                     st.rerun()
 
     else:
-        st.write("Please select or create a project to continue.")
+        st.write("Please create a project to continue.")
 
     # Display message if it exists in session state
     if 'message' in st.session_state and st.session_state.message:
@@ -390,53 +402,54 @@ def main():
         st.session_state.message = None
         st.session_state.message_type = None
         st.divider()
-    
-    st.subheader("Resume Existing Project")
+#     """   
+#     st.subheader("Resume Existing Project") #blocking for now, will remove when tested
 
-    uploaded_zip = st.file_uploader(
-        "Upload a TALLMesh project bundle (.zip)",
-        type=["zip"],
-        key="project_bundle_upload"
-    )
+#     uploaded_zip = st.file_uploader(
+#         "Upload a TALLMesh project bundle (.zip)",
+#         type=["zip"],
+#         key="project_bundle_upload"
+#     )
 
-    if uploaded_zip and st.button("Restore Project Bundle"):
-        try:
-            restore_project_from_zip(uploaded_zip)
-            st.success("Project restored successfully.")
-            st.session_state.projects = get_projects()
-            st.rerun()
-        except Exception as e:
-            st.error(f"Could not restore project: {e}")
+#     if uploaded_zip and st.button("Restore Project Bundle"):
+#         try:
+#             restore_project_from_zip(uploaded_zip)
+#             st.success("Project restored successfully.")
+#             st.session_state.projects = get_projects()
+#             st.rerun()
+#         except Exception as e:
+#             st.error(f"Could not restore project: {e}")
+# """
+#     """
+#     st.divider() #blocking for now, will remove when tested
+#     st.subheader("Export / Clear Workspace")
 
-    st.divider()
-    st.subheader("Export / Clear Workspace")
+#     if st.session_state.selected_project:
+#         if st.button("Prepare Project Bundle"):
+#             zip_path = make_project_zip(st.session_state.selected_project)
 
-    if st.session_state.selected_project:
-        if st.button("Prepare Project Bundle"):
-            zip_path = make_project_zip(st.session_state.selected_project)
+#             with open(zip_path, "rb") as f:
+#                 st.download_button(
+#                     label="Download Project Bundle",
+#                     data=f,
+#                     file_name=f"{st.session_state.selected_project}.zip",
+#                     mime="application/zip"
+#                 )
+#     else:
+#         st.info("Select a project to export it as a bundle.")
 
-            with open(zip_path, "rb") as f:
-                st.download_button(
-                    label="Download Project Bundle",
-                    data=f,
-                    file_name=f"{st.session_state.selected_project}.zip",
-                    mime="application/zip"
-                )
-    else:
-        st.info("Select a project to export it as a bundle.")
+#     confirm_delete = st.checkbox(
+#         "I confirm I have downloaded anything I need.",
+#         key="confirm_clear_workspace"
+#     )
 
-    confirm_delete = st.checkbox(
-        "I confirm I have downloaded anything I need.",
-        key="confirm_clear_workspace"
-    )
-
-    if confirm_delete and st.button("Clear My Workspace"):
-        clear_user_workspace()
-        st.session_state.projects = get_projects()
-        st.session_state.selected_project = None
-        st.success("Workspace cleared.")
-        st.rerun()
-
+#     if confirm_delete and st.button("Clear My Workspace"):
+#         clear_user_workspace()
+#         st.session_state.projects = get_projects()
+#         st.session_state.selected_project = None
+#         st.success("Workspace cleared.")
+#         st.rerun()
+# """
 
 # Entry point of the script
 if __name__ == "__main__":

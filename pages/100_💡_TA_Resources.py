@@ -11,6 +11,9 @@ The module includes:
 """
 
 import streamlit as st
+from ui_utils import sidebar_data_controls
+
+sidebar_data_controls()
 
 # Set logo
 logo = "pages/static/tmeshlogo.png"

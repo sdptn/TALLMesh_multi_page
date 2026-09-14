@@ -17,6 +17,9 @@ import os
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+from ui_utils import sidebar_data_controls
+
+sidebar_data_controls()
 
 # Set logo
 logo = "pages/static/tmeshlogo.png"

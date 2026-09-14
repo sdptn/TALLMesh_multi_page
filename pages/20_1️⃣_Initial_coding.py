@@ -16,7 +16,9 @@ import logging
 import tooltips
 import time
 from instructions import initial_coding_instructions
+from ui_utils import sidebar_data_controls
 
+sidebar_data_controls()
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

@@ -22,7 +22,8 @@ import pandas as pd
 import plotly.express as px
 import os
 from project_utils import get_projects, get_user_project_dir, get_processed_files
-
+from ui_utils import sidebar_data_controls
+sidebar_data_controls()
 # Set logo
 logo = "pages/static/tmeshlogo.png"
 st.logo(logo)

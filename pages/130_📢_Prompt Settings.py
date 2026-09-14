@@ -12,6 +12,9 @@ import streamlit as st
 import json
 from prompts import initial_coding_prompts, reduce_duplicate_codes_prompts, finding_themes_prompts
 import tooltips
+from ui_utils import sidebar_data_controls
+
+sidebar_data_controls()
 
 # Set logo
 logo = "pages/static/tmeshlogo.png"

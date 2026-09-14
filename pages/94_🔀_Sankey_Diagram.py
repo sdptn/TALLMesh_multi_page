@@ -18,6 +18,9 @@ import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
 import streamlit.components.v1 as components
+from ui_utils import sidebar_data_controls
+
+sidebar_data_controls()
 
 # Set logo
 logo = "pages/static/tmeshlogo.png"

@@ -26,6 +26,9 @@ import uuid
 from time import sleep
 from instructions import pairwise_reduce_codes_instructions
 from text_processing import generate_comparison_prompt, validate_json_response
+from ui_utils import sidebar_data_controls
+
+sidebar_data_controls()
 
 
 logo = "pages/static/tmeshlogo.png"

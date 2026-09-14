@@ -18,7 +18,9 @@ import numpy as np
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from project_utils import get_projects, get_project_files, get_processed_files
+from ui_utils import sidebar_data_controls
 
+sidebar_data_controls()
 # Set logo
 logo = "pages/static/tmeshlogo.png"
 st.logo(logo)
