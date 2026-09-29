@@ -24,7 +24,7 @@ st.logo(logo)
 st.header(":orange[Resume and Manage Project]")
 
 st.write(
-    ":green[Resume an existing project. "
+    ":green[Continue working on an existing project, restore a previously downloaded project. "
     "Add or remove files.]"
 )
 

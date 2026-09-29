@@ -170,7 +170,7 @@ def render_additional_features():
     1. **Saturation Metric:** Our app includes a tool to measure Initial Thematic Saturation (ITS), 
        which can help researchers assess the comprehensiveness of their analysis.
 
-    2. **Visualizations:** The Theme-Codes Icicle and Thematic Network Map provide visual representations 
+    2. **Visualisations:** The visualisations provide visual representations 
        of the thematic structure, aiding in the review and interpretation of results.
 
     3. **Flexibility:** Throughout the process, users can adjust prompts, model settings, and iterate 

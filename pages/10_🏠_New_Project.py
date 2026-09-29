@@ -272,6 +272,8 @@ def main():
                  Create a new TALLMesh project and upload the files you want to analyse).
                  
                  Give your project a unique name, create it, and then upload your interview or qualitative data files below.
+
+                 To continue working on an existing or previously downloaded project, use the **📂 Resume and Manage Project** page.
                  """)
    
    

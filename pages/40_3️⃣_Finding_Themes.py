@@ -665,7 +665,7 @@ def main():
                 )
 
     else:
-        st.write("Please select a project to continue. If you haven't set up a project yet, head over to the '🏠 Folder Set Up' page to get started.")
+        st.write("Please select a project to continue. If you haven't set up a project yet, head over to the '🏠 New Project' page to get started.")
 
 
 if __name__ == "__main__":

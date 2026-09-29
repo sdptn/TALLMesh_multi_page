@@ -8,84 +8,52 @@ Abstract page instructions & blurb to avoid repetitions & walls of text in code
 
 
 def project_setup_instructions():
-    st.header(":orange[Project Set Up & File Management]")
-    
+    st.header(":orange[Project Setup & File Management]")
+
     with st.expander("Instructions"):
         st.write("""
-        The "Folder Set Up" page is where you'll begin your thematic analysis journey. This page allows you to create new projects, manage existing ones, and upload the files you want to analyze. Here's how to use it:
+        The Project Setup page is where you begin your analysis. Create a new
+        project and upload the qualitative data files you want to analyse.
         """)
 
-        # 1. Creating a New Project
         st.subheader(":orange[1. Creating a New Project]")
         st.write("""
-        - Enter a unique name for your project in the "Enter new project name:" text box.
-        - Hit enter or click the "Create Project" button to set up your project.
-        - The system will create a new folder structure for your project, including subfolders for data, initial codes, reduced codes, themes, and more.
+        - Enter a unique name for your project.
+        - Click **Create Project**.
+        - TALLMesh will create the project workspace used to store your uploaded
+          files and analysis outputs.
         """)
 
-        st.code("""
-        YOUR_PROJECT_NAME/          # The name you assign to your project.
-        ├── data/                   # This folder holds all of your raw data files (e.g., interview transcripts).
-        ├── initial_codes/          # After initial codes have been parsed, the resultant files are stored here.
-        ├── reduced_codes/          # This folder contains the results from your reduction of codes processing.
-        ├── themes/                 # Themes derived from reduced codes.
-        ├── theme_books/            # Combines outputs from above to generate a file with structure theme > reduced codes > initial codes > quotes > source files.
-        └── expanded_reduced_codes/ # Contains expanded view of reduced_codes; needed for matching sources, quotes, and codes.
-        """, language="")
-
-        # 2. Selecting an Existing Project
-        st.subheader(":orange[2. Selecting an Existing Project]")
+        st.subheader(":orange[2. Uploading Files]")
         st.write("""
-        - Use the dropdown menu labeled "Select a project:" to choose from your existing projects.
-        - Once selected, you'll see the project name displayed and have options to manage its files.
+        - Select the project you want to work with.
+        - Upload the qualitative data files you want to analyse.
+        - TALLMesh supports TXT, PDF, DOCX, and RTF files.
+        - Uploaded files are stored within your temporary TALLMesh workspace.
         """)
 
-        # 3. Uploading Files
-        st.subheader(":orange[3. Uploading Files]")
+        st.subheader(":orange[3. Project Data]")
         st.write("""
-        - With a project selected, you'll see a file uploader labeled "Upload interviews .txt files".
-        - You can drag and drop multiple .txt files or click to browse and select them.
-        - Files will be automatically uploaded when selected or dropped.
-        - Successful uploads will be confirmed with a message.
-        - Note: Only .txt files are allowed. For other file types, please use the file_upload_and_conversion page to convert a range of other text formats to .txt
+        - Project workspaces are temporary and should not be used as permanent storage.
+        - Workspaces inactive for more than 24 hours are automatically deleted.
+        - Download your project if you want to retain your files and analysis outputs.
+        - Use **Clear Workspace** when you have finished to remove your workspace data.
         """)
 
-        # 4. Managing Existing Files
-        st.subheader(":orange[4. Managing Existing Files]")
-        st.write("""
-        - Below the file uploader, you'll see a list of all files currently in your project.
-        - Each file has a checkbox next to it. Select the checkbox for any files you want to delete.
-        - Click 'Delete Selected Files' to remove selected files from your project. 
+        st.warning("""
+        Do not upload sensitive, confidential, or personally identifiable data
+        unless you have appropriate authorisation to process it using these services.
+        Data submitted for LLM analysis is sent to the GRAPHIA LLM service and
+        requests may be recorded in service logs.
         """)
 
-        # 5. Deleting a Project
-        st.subheader(":orange[5. Deleting a Project]")
-        st.write("""
-        - If you need to remove an entire project, select it from the dropdown and click the "Delete Project" button.
-        - This action will remove all files and folders associated with the project, so use it carefully.
-        """)
-
-        # 6. API Key Management
-        st.subheader(":orange[6. API Key Management]")
-        st.write("""
-        - In the sidebar (on all pages), you'll find options to manage your API keys for different AI providers.
-        - You can add new keys, view existing ones (last few digits only for security), and delete keys as needed.
-        """)
-
-        st.info("""
-            **Note:** The Azure API works a little differently to other providers. To manage Azure API credentials please see the :orange[⚙️_Azure_Settings page].
-        """)
-
-        # Tips
         st.subheader(":orange[Tips]")
         st.write("""
-        - Always double-check your project selection before uploading or deleting files.
-        - It's recommended to use descriptive names for your projects to easily identify them later.
-        - If you're analyzing interviews, consider naming your files consistently (e.g., "1_Interview_topic.txt", "2_Interview_topic.txt").
-        - Remember that deleting files or projects is permanent and cannot be undone.
+        - Use descriptive project names so projects are easy to identify.
+        - Use consistent filenames, particularly when working with multiple interviews
+          or other qualitative data sources.
+        - Review LLM-generated outputs before proceeding to subsequent stages of the analysis.
         """)
-
-        st.info(":bulb: By properly setting up your project and managing your files here, you'll have a solid foundation for the subsequent steps in your thematic analysis process.")
 
 
 def initial_coding_instructions():
@@ -126,8 +94,8 @@ def initial_coding_instructions():
         )
         st.subheader(":orange[1. Project Selection]")
         st.write("""
-        - Use the dropdown menu to select the project you want to work on.
-        - If you haven't set up a project yet, you'll be prompted to go to the 'Folder Set Up' page first.
+        - Select the project you want to work on.
+        - If you haven't created a project yet, return to **🏠 New Project** first.
         """)
 
         st.subheader(":orange[2. File Selection]")
@@ -139,12 +107,11 @@ def initial_coding_instructions():
 
         st.subheader(":orange[3. LLM Settings]")
         st.write("""
-        - Choose the AI model you want to use for the analysis from the dropdown menu. 
-        - Select a preset prompt or edit the provided prompt to customize your analysis.
-        - Adjust the model temperature and top_p values using the sliders. These parameters control the creativity and randomness of the AI's output.
+        - Choose the available GRAPHIA model you want to use for the analysis.
+        - Select a preset prompt or edit the provided prompt to customise your analysis.
+        - Adjust the available model parameters where required.
         """)
 
-        st.info("Make sure you have provided an API key for the provider of the model you have selected (e.g., Anthropic, Azure, OpenAI)")
 
         st.subheader(":orange[4. Processing Files]")
         st.write("""

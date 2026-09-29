@@ -96,8 +96,6 @@ def process_file(file_path, model, prompt, model_temperature, model_top_p, statu
     status_message.info(f"Processing file: {os.path.basename(file_path)}")
     
 
-    #for llama might need to chunk further but the default alias-large blablador model works fine
-
     chunks = split_text(content)
 
     all_codes = []
@@ -310,7 +308,7 @@ def main():
                     mime="text/csv"
                 )
     else:
-        st.write(f"Please select a project to continue. If you haven't set up a project yet, head over to the '🏠 Project Set Up' page to get started")
+        st.write(f"Please select a project to continue. If you created a project yet, head over to the '🏠 Project Set Up' page to get started")
 
 
 

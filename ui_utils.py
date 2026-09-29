@@ -29,7 +29,7 @@ def centered_column_with_number(column, number, title, image):
     with column:
         st.markdown(create_circle_number(number), unsafe_allow_html=True)
         st.markdown(f"<h3 style='text-align: center; color: orange;'>{title}</h3>", unsafe_allow_html=True)
-        st.image(image, use_column_width=True)
+        st.image(image, width="stretch")
 
 #Function to create a download button for project data in the sidebar
 def sidebar_data_controls():
@@ -37,6 +37,12 @@ def sidebar_data_controls():
     #st.sidebar.divider()
     st.sidebar.caption("Project Data")
 
+    st.sidebar.info(
+        "Project data is temporary. Download your project if you want to keep it. "
+        "Workspaces inactive for more than 24 hours are automatically deleted. "
+        "Use Clear Workspace when you have finished to remove your data."
+    )
+    
     selected_project = st.session_state.get("selected_project")
 
     if selected_project:

@@ -7,59 +7,67 @@ from ui_utils import sidebar_data_controls
 sidebar_data_controls()
 
 def main():
-    # Set page config
-    st.set_page_config(page_title="Data Processing Disclaimer", page_icon="⚠️")
-    
-    # Display logo
-    #logo = "pages/static/tmeshlogo.png"
-    #st.image(logo)
-    
-    # Main disclaimer
-    st.title("⚠️ Important Disclaimer")
-    st.error("""
-        **Please read carefully before proceeding:**
-        - You are responsible for ensuring compliance with your organization's data protection policies
-        - Verify all data handling requirements before using this service
-        - Check your organization's policies regarding AI model usage
-        - Conduct appropriate risk assessments for your use case
-    """)
-    
-    # OpenAI Section
-    st.header("OpenAI Data Usage Policy")
-    st.info("""
-        Data submitted through the OpenAI API is not used to train OpenAI models or improve OpenAI's service offering. 
-        
-        Note: Data submitted through non-API consumer services (ChatGPT or DALL·E) may be used to improve OpenAI's models.
-        
-        For full details, see: https://openai.com/consumer-privacy/
-    """)
-    
-    # Azure OpenAI Section
-    st.header("Azure OpenAI Service Policy")
-    st.info("""
-        Your prompts (inputs) and completions (outputs), your embeddings, and your training data:
-        - Are NOT available to other customers
-        - Are NOT available to OpenAI
-        - Are NOT used to improve OpenAI models
-        - Are NOT used to train, retrain, or improve Azure OpenAI Service foundation models
-        - Are NOT used to improve any Microsoft or 3rd party products or services without your permission
-        
-        Additional information:
-        - Your fine-tuned Azure OpenAI models are available exclusively for your use
-        - The Azure OpenAI Service is operated by Microsoft in Microsoft's Azure environment
-        - The Service does NOT interact with any services operated by OpenAI
-        
-        For full details, see: https://learn.microsoft.com/en-us/legal/cognitive-services/openai/data-privacy
+    st.set_page_config(page_title="Data Ethics", page_icon="⚖️")
+
+    st.title("⚖️ Data Ethics")
+
+    st.warning("""
+    **Please consider the sensitivity of your data before using TALLMesh.**
+
+    You are responsible for ensuring that your use of TALLMesh complies with
+    relevant ethical approvals, data-protection requirements, and your
+    organisation's policies on the use of AI and research data.
     """)
 
-    st.header("How TALLMesh Handles Data")
+    st.header("How TALLMesh Processes Your Data")
+
+    st.write("""
+    TALLMesh stores uploaded files and generated analysis outputs temporarily
+    within your project workspace.
+
+    When you use LLM-assisted analysis features, relevant research data is sent
+    to the GRAPHIA LLM service for processing. Depending on the analysis stage,
+    this may include transcript text, codes, code descriptions, quotations,
+    prompts, and generated analysis outputs.
+
+    Requests to the LLM service may be recorded in service logs. The retention
+    and handling of those logs are determined by the infrastructure supporting
+    the GRAPHIA LLM service and are separate from TALLMesh's own workspace
+    retention.
+    """)
+
+    st.header("TALLMesh Workspace Retention")
+
+    st.write("""
+    TALLMesh project workspaces are temporary. A workspace that has been
+    inactive for more than 24 hours is automatically deleted. Cleanup checks
+    are performed periodically, so deletion may occur after the 24-hour
+    threshold rather than at exactly 24 hours.
+
+    If you want to retain your analysis, download your project using **💾 Prepare Project Download** before leaving
+    it inactive. You can also use **🗑️ Clear Workspace** in the sidebar to remove
+    the contents of your workspace when you have finished.
+    """)
+
+    st.header("Sensitive and Personal Data")
+
+    st.write("""
+    Do not upload sensitive, confidential, or personally identifiable
+    information unless you have appropriate authorisation and have determined
+    that processing the data through the available infrastructure is permitted.
+
+    Before uploading research data, consider whether it should be anonymised or
+    otherwise prepared in accordance with your ethical approval and
+    institutional data-management requirements.
+    """)
+
+    st.header("Researcher Responsibility")
+
     st.info("""
-        When you git clone and set up TALLMesh, it creates several directories within the project working directory which store potentially sensitive information you should be aware of..
-        - api_keys.json ; whenever you add or remove keys via the GUI, they are stored (or deleted from) this file.
-        - azure_settings.json ; any custom azure endpoints, deployments, and API keys are stored here.  
-        - projects ; within the projects directory, you will find all of your raw and processed data files (e.g., transcripts, codes, themes).
-        - custom_prompts.json ; if you create custom prompts, they will be saved here. They can be deleted from file or via the :orange[📢 Prompt Settings] page.
-        -       
+    TALLMesh is an experimental research tool designed to assist thematic
+    analysis. LLM-generated codes, reductions, and candidate themes should be
+    reviewed critically by the researcher and should not be treated as a
+    substitute for researcher judgement.
     """)
     
 
